@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Newtonsoft.Json
+@using Stroom.Shared.Models
+@using static System.Net.WebRequestMethods
+@inject NavigationManager NavManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">My Page</MudNavLink>
+    <MudNavGroup Title="Projects" Icon="@Icons.Outlined.Workspaces" Expanded="true">
+        <MudNavLink Href="/project/new" Icon="@Icons.Filled.Add">Add new</MudNavLink>
+        @foreach(var project in projects)
+        {
+            <MudNavLink Href="@($"project/{project.Name}")">@project.Name</MudNavLink>
+        }
+    </MudNavGroup>
+    <MudNavLink Href="/documentation" Icon="@Icons.Custom.FileFormats.FileDocument">Documentation</MudNavLink>
+    <MudNavLink Href="/settings" Icon="@Icons.Filled.Settings">Settings</MudNavLink>
+</MudNavMenu>
+
+
+@code {
+    private Project[] projects = new Project[0];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //projects = await Http.GetFromJsonAsync<Project[]>("Project");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
+}
