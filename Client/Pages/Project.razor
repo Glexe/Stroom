@@ -14,6 +14,8 @@
     </MudPaper>
 
     <MudPaper Class="pa-4">
+        <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@_Issue.Name</MudText>
+        <MudDivider Class="my-3"/>
         <MudStack Row="true" Spacing="4">
             <MudItem Style="width: 40%; float: left;">
                 <MudStack Spacing="4">
@@ -85,7 +87,6 @@
     private List<UserComment> UserComments;
     private UserComment _UserComment;
     private Issue _Issue;
-    private User _User;
 
     private bool OrderCommentsDescending = true;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
@@ -97,7 +98,6 @@
 
         _UserComment = userComment;
         _Issue = userComment.Issue;
-        _User = userComment.User;
         UserComments = new List<UserComment>()
         {
             new UserComment(),

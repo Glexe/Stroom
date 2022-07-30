@@ -8,7 +8,7 @@ namespace Stroom.Shared.Models
 {
     public class Project
     {
-        public string Name { get; set; } = "New Project";
+        public string Name { get; set; } = "Mars colony";
         public IEnumerable<Issue> AssignedIssues;
     }
 }

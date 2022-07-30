@@ -19,5 +19,6 @@ namespace Stroom.Shared.Models
         public float WorkedTime { get; set; } = 2f;
         public string SubmitionDate { get; set; } = "April 14, 2022";
         public string DueDate { get; set; } = "April 28, 2022";
+        public Project Project { get; set; } = new Project();
     }
 }
