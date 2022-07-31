@@ -2,13 +2,124 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Shared
+@using Stroom.Shared.Models
 @attribute [Authorize]
 @inject HttpClient Http
 
 <PageTitle>Settings</PageTitle>
 
-<h1>Settings</h1>
+<MudButton Style="font-weight: 500;" OnClick="@ToggleOpen">@_Issue.Name</MudButton>
+
+<MudPopover Open="@IsOpen" Fixed="true" Class="px-4 pt-4">
+    <MudButton Style="font-weight: 500;" OnClick="@ToggleOpen">Close</MudButton>
+    <MudStack>
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.subtitle2">@ProjectName / Task ID - @_Issue.IssueID</MudText>
+        </MudPaper>
+    
+        <MudPaper Class="pa-4">
+            <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@_Issue.Name</MudText>
+            <MudDivider Class="my-3"/>
+            <MudStack Row="true" Spacing="4">
+                <MudItem Style="width: 40%; float: left;">
+                    <MudStack Spacing="4">
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Status:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.Status</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Priority:</MudText>
+                            <MudText Typo="Typo.body2" >@_Issue.Priority</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Owner:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.Owner</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Assignee:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.Assignee</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudItem>
+                <MudItem Style="width: 60%; float: right;">
+                    <MudStack Spacing="4">
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Submition Date:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.SubmitionDate</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Due Date:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.DueDate</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Estimated Time:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.EstimatedTime h</MudText>
+                        </MudStack> 
+                        <MudStack Row="true" Spacing="8">
+                            <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Worked Time:</MudText>
+                            <MudText Typo="Typo.body2">@_Issue.WorkedTime h</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudItem>
+            </MudStack>
+    
+            <MudDivider Class="my-3" />
+            <MudStack>
+                <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Description:</MudText>
+                <MudText Typo="Typo.body2">@_Issue.Description h</MudText>
+            </MudStack>
+        </MudPaper>
+    
+        <button class="btn btn-primary" @onclick="FlipSortDirection">New at the <b>@(OrderCommentsDescending ? "Top" : "Bottom")</b></button>
+        @for (var i = 0; i < UserComments.Count; i++)
+        {
+            var userComment = UserComments[i];
+            var commentNumber = OrderCommentsDescending ? UserComments.Count - i : i + 1;
+            <MudPaper Class="pa-4">
+                <span class="width: 100%;">
+                    <MudText Typo="Typo.caption">#@commentNumber @userComment.User.Name @userComment.User.Surname</MudText>
+                    <MudText Typo="Typo.caption" Style="float: right;">@userComment.TimeStamp.ToString("dd-MM-yyyy H:mm")</MudText>
+                </span>
+                <MudText Typo="Typo.body1">@userComment.Comment</MudText>
+            </MudPaper>
+        }
+    </MudStack>
+</MudPopover>
 
 @code {
+    [Parameter]
+    public string ProjectName { get; set; }
 
+    public bool IsOpen { get; set; }
+
+    private List<UserComment> UserComments;
+    private UserComment _UserComment;
+    private Issue _Issue;
+
+    private bool OrderCommentsDescending = true;
+    private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userComment = new UserComment();
+
+        _UserComment = userComment;
+        _Issue = userComment.Issue;
+        UserComments = new List<UserComment>()
+        {
+            new UserComment(),
+            new UserComment(),
+            new UserComment(),
+            new UserComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
+            new UserComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
+        }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+    }
+
+    private void FlipSortDirection(){
+        OrderCommentsDescending = !OrderCommentsDescending;
+        UserComments = UserComments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+    }
+
+    void ToggleOpen() { IsOpen = !IsOpen; }
 }

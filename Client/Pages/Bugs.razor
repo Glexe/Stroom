@@ -1,0 +1,129 @@
+﻿@page "/bugs"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Shared
+@using Stroom.Shared.Models
+@attribute [Authorize]
+@inject HttpClient Http
+
+<PageTitle>Bugs</PageTitle>
+
+<style>
+    .flex-bottom{
+        display: flex;
+        align-items: flex-end;
+    }
+</style>
+
+<MudExpansionPanels MultiExpansion="true">
+    <div class="d-flex">
+	    <MudButton Style="cursor: pointer;" OnClick="@ToggleOpen">
+	    	@selectedProjectName
+	    <MudPopover Open="@_isOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+	    	<div class="d-flex flex-column pa-1">
+                @foreach(var projectName in ProjectNames)
+                {
+                    <MudButton OnClick="@(e => SelectProject(projectName))">@projectName</MudButton>
+                }
+	    	</div>
+	    </MudPopover>
+	    </MudButton>
+    </div>
+
+    <MudSwitch @bind-Checked="@assignedToMeOnly" Label="Assigned to me"></MudSwitch>
+    @foreach(var statusName in StatusNames)
+    {
+        var issuesCount = Issues.Count(i => i.Status == statusName);
+        <MudExpansionPanel Class="mb-3">
+             <TitleContent>
+                    <div class="flex-bottom">
+                        <MudIcon Icon="@Icons.Filled.KeyboardArrowDown" class="mr-3"></MudIcon>
+                        <MudText class="mr-3"><strong>@statusName</strong></MudText>
+                        <MudText Typo="Typo.caption">@issuesCount tasks</MudText>
+                    </div>
+                </TitleContent>
+            <ChildContent>
+                <MudSimpleTable Style="overflow-x: auto; box-shadow: none;">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>IssueID</th>
+                            <th>Name</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>EstimatedTime</th>
+                            <th>WorkedTime</th>
+                            <th>DueDate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var issue in Issues.Where(i => i.Status == statusName).ToList())
+                        {
+                            <tr>
+                                <td>@issue.Project.Name</td>
+                                <td>@issue.IssueID</td>
+                                <td><a href="project/new" Style="font-weight: 500; color: blue;">@issue.Name</a></td>
+                                <td>@issue.Priority</td>
+                                <td>@issue.Status</td>
+                                <td>@issue.EstimatedTime</td>
+                                <td>@issue.WorkedTime</td>
+                                <td>@issue.DueDate</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+
+@code {
+    string[] StatusNames = new[] { "To do", "Not ready", "In work", "Completed" };
+    private bool assignedToMeOnly = false;
+
+    private string searchString = "";
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+
+    private int pagesCount => (int) (Math.Ceiling(((double)Issues.Count() / (double)rowsPerPage)));
+
+    private IEnumerable<Issue> Issues = new List<Issue>();
+    private IEnumerable<string> ProjectNames => Issues.Select(i => i.Project.Name).Distinct().ToList();
+    private bool _allProject = true;
+    private string selectedProjectName = "All projects";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Issues = new List<Issue> { new Issue() { Status = "To do" }, new Issue() { Status = "To do" }, new Issue() { Status = "To do", Project = new Stroom.Shared.Models.Project() { Name = "test" } }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Completed" }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
+    }
+
+    public bool _isOpen;
+
+    public void ToggleOpen()
+    {
+        if (_isOpen)
+            _isOpen = false;
+        else
+            _isOpen = true;
+    }
+
+    public void SelectProject(string projectName)
+    {
+        _allProject = projectName == "All projects";
+        selectedProjectName = projectName;
+        _isOpen = false;
+    }
+
+    private bool FilterFunc(Issue issue)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (issue.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (issue.IssueID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}
