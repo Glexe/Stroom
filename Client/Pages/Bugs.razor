@@ -16,29 +16,38 @@
 </style>
 
 <MudExpansionPanels MultiExpansion="true">
-    <div class="d-flex">
-	    <MudButton Style="cursor: pointer;" OnClick="@ToggleOpen">
-	    	@selectedProjectName
+    <div class="d-flex mb-4" style="justify-content: space-between;">
+	    <MudButton Style="cursor: pointer; font-weight: bold;" OnClick="@ToggleOpen">
+	    	@SelectedProjectName
+        <MudIcon Icon="@(_isOpen ? Icons.Filled.KeyboardArrowUp : Icons.Filled.KeyboardArrowDown)" />
 	    <MudPopover Open="@_isOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
 	    	<div class="d-flex flex-column pa-1">
+                <MudButton Style="@(ShowAllProject ? "font-weight: bold;" : "font-weight: 400;")" OnClick="@(e => SelectProject(AllProjectsButtonText))">@AllProjectsButtonText</MudButton>
+                <MudDivider Style="background-color: black;" />
                 @foreach(var projectName in ProjectNames)
                 {
-                    <MudButton OnClick="@(e => SelectProject(projectName))">@projectName</MudButton>
+                    <MudButton Style="@(SelectedProjectName == projectName ? "font-weight: bold;" : "font-weight: 400;")" OnClick="@(e => SelectProject(projectName))">@projectName</MudButton>
                 }
 	    	</div>
 	    </MudPopover>
 	    </MudButton>
-    </div>
 
-    <MudSwitch @bind-Checked="@assignedToMeOnly" Label="Assigned to me"></MudSwitch>
+        <MudStack Row="true" Style="align-items: center;" Spacing="0">
+            <MudText Style="@(AssignedToMeOnly ? "font-weight: 400;" : "font-weight: 500;")">All tasks</MudText>
+            <MudSwitch @bind-Checked="@AssignedToMeOnly" Color="Color.Primary" Style="margin-left: 0 !important; margin-inline-end: 0 !important;"></MudSwitch>
+            <MudText Style="@(AssignedToMeOnly ? "font-weight: 500;" : "font-weight: 400;")">Assigned to me</MudText>
+        </MudStack>
+    </div>
     @foreach(var statusName in StatusNames)
     {
-        var issuesCount = Issues.Count(i => i.Status == statusName);
+        var issuesFiltered = Issues.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
+        var issuesCount = issuesFiltered.Count;
+
         <MudExpansionPanel Class="mb-3">
              <TitleContent>
                     <div class="flex-bottom">
                         <MudIcon Icon="@Icons.Filled.KeyboardArrowDown" class="mr-3"></MudIcon>
-                        <MudText class="mr-3"><strong>@statusName</strong></MudText>
+                        <MudText class="mr-3" Style="font-weight: 500;">@statusName</MudText>
                         <MudText Typo="Typo.caption">@issuesCount tasks</MudText>
                     </div>
                 </TitleContent>
@@ -57,7 +66,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var issue in Issues.Where(i => i.Status == statusName).ToList())
+                        @foreach (var issue in issuesFiltered)
                         {
                             <tr>
                                 <td>@issue.Project.Name</td>
@@ -79,24 +88,27 @@
 
 
 @code {
-    string[] StatusNames = new[] { "To do", "Not ready", "In work", "Completed" };
-    private bool assignedToMeOnly = false;
+    private string[] StatusNames = new[] { "To do", "Not ready", "In work", "Completed" };
+    private readonly string AllProjectsButtonText = "All projects";
+    private readonly int CurrentPage = 1;
+    private readonly int RowsPerPage = 10;
+    
+    private bool AssignedToMeOnly = false;
 
-    private string searchString = "";
-    private int currentPage = 1;
-    private int rowsPerPage = 10;
+    private string CurrentUserName = "Emma Wills"; //todo: parse somehow current user name
+    private string SearchString = "";
 
-    private int pagesCount => (int) (Math.Ceiling(((double)Issues.Count() / (double)rowsPerPage)));
+    private int PagesCount => (int) (Math.Ceiling(((double)Issues.Count() / (double)RowsPerPage)));
 
     private IEnumerable<Issue> Issues = new List<Issue>();
     private IEnumerable<string> ProjectNames => Issues.Select(i => i.Project.Name).Distinct().ToList();
-    private bool _allProject = true;
-    private string selectedProjectName = "All projects";
+    private bool ShowAllProject = true;
+    private string SelectedProjectName = "All projects";
 
 
     protected override async Task OnInitializedAsync()
     {
-        Issues = new List<Issue> { new Issue() { Status = "To do" }, new Issue() { Status = "To do" }, new Issue() { Status = "To do", Project = new Stroom.Shared.Models.Project() { Name = "test" } }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Completed" }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
+        Issues = new List<Issue> { new Issue() { Status = "To do", Assignee = "Hlib Pivniev" }, new Issue() { Status = "To do" }, new Issue() { Status = "To do", Project = new Stroom.Shared.Models.Project() { Name = "test" } }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Completed" }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
     }
 
     public bool _isOpen;
@@ -111,18 +123,18 @@
 
     public void SelectProject(string projectName)
     {
-        _allProject = projectName == "All projects";
-        selectedProjectName = projectName;
+        ShowAllProject = (projectName == "All projects");
+        SelectedProjectName = projectName;
         _isOpen = false;
     }
 
     private bool FilterFunc(Issue issue)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(SearchString))
             return true;
-        if (issue.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (issue.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (issue.IssueID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (issue.IssueID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
