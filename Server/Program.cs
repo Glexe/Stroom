@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Stroom.Server.Data;
 using Stroom.Server.Models;
+using Stroom.Server.Repositories;
 
 namespace Stroom
 {
@@ -31,6 +31,9 @@ namespace Stroom
             builder.Services.AddRazorPages();
             builder.Services.AddLogging();
 
+            builder.Services.AddScoped<IProjectsRepository, TestProjectsRepository>();
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -57,6 +60,7 @@ namespace Stroom
             app.UseAuthentication();
             app.UseAuthorization();
 
+            
 
             app.MapRazorPages();
             app.MapControllers();

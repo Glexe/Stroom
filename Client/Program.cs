@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
+using Stroom.Client.Services;
 
 namespace Stroom.Client
 {
@@ -21,6 +22,8 @@ namespace Stroom.Client
 
             builder.Services.AddApiAuthorization();
             builder.Services.AddMudServices();
+
+            builder.Services.AddScoped<IProjectsService, TestProjectsService>();
 
             await builder.Build().RunAsync();
         }

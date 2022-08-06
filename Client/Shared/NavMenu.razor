@@ -11,10 +11,10 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">My Page</MudNavLink>
     <MudNavLink Href="/bugs" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.BugReport">Bugs</MudNavLink>
     <MudNavGroup Title="Projects" Icon="@Icons.Outlined.Workspaces" Expanded="true">
-        <MudNavLink Href="/project/new" Icon="@Icons.Filled.Add">Add new</MudNavLink>
+        <MudNavLink Href="/projects/new" Icon="@Icons.Filled.Add">Add new</MudNavLink>
         @foreach(var project in projects)
         {
-            <MudNavLink Href="@($"project/{project.Name}")">@project.Name</MudNavLink>
+            <MudNavLink Href="@($"projects/{project.Name}")">@project.Name</MudNavLink>
         }
     </MudNavGroup>
     <MudNavLink Href="/documentation" Icon="@Icons.Custom.FileFormats.FileDocument">Documentation</MudNavLink>
@@ -23,7 +23,7 @@
 
 
 @code {
-    private Project[] projects = new Project[0];
+    private ProjectDto[] projects = new ProjectDto[0];
 
     protected override async Task OnInitializedAsync()
     {

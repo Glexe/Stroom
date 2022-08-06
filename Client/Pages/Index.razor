@@ -28,7 +28,7 @@
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="EstimatedTime">@context.EstimatedTime h</MudTd>
         <MudTd DataLabel="WorkedTime">@context.WorkedTime h</MudTd>
-        <MudTd DataLabel="DueDate">@context.DueDate</MudTd>
+        <MudTd DataLabel="DueDate">@context.DueDate?.ToShortDateString()</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>

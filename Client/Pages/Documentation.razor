@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Shared
+@using Stroom.Shared.Models
 @attribute [Authorize]
 @inject HttpClient Http
 
@@ -9,6 +10,24 @@
 
 <h1>Documentation</h1>
 
-@code {
 
+
+@code {
+    private Issue Issue { get; set; }
+    private Project SelectedProject { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Issue = new Issue();
+    }
+
+    private void Cancel(){
+
+    }
+
+    private void Save()
+    {
+        
+    }
 }

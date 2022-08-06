@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Stroom.Shared;
 using Stroom.Shared.Models;
+using Stroom.Server.Repositories;
 
 namespace Stroom.Server.Controllers
 {
@@ -12,20 +13,18 @@ namespace Stroom.Server.Controllers
     {
 
         private readonly ILogger<ProjectsController> _logger;
+        private readonly IProjectsRepository ProjectsRepository;
 
-        public ProjectsController(ILogger<ProjectsController> logger)
+        public ProjectsController(ILogger<ProjectsController> logger, IProjectsRepository projectsRepository)
         {
             _logger = logger;
+            ProjectsRepository = projectsRepository;
         }
 
         [HttpGet]
-        public IEnumerable<Project> Get()
+        public IEnumerable<ProjectDto> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new Project
-            {
-                Name = $"Project #{Random.Shared.Next(1,20)}"
-            })
-            .ToArray();
+            return ProjectsRepository.GetProjects();
         }
     }
 }

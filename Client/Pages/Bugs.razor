@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Shared
+@using Stroom.Shared.Enums
 @using Stroom.Shared.Models
+@using static Stroom.Shared.Enums.BugPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
 
@@ -38,10 +40,11 @@
             <MudText Style="@(AssignedToMeOnly ? "font-weight: 500;" : "font-weight: 400;")">Assigned to me</MudText>
         </MudStack>
     </div>
-    @foreach(var statusName in StatusNames)
+    @foreach(var statusName in BugPropertiesEnums.BugStatuses)
     {
         var issuesFiltered = Issues.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
         var issuesCount = issuesFiltered.Count;
+        if (issuesCount < 1) continue;
 
         <MudExpansionPanel Class="mb-3">
              <TitleContent>
@@ -76,7 +79,7 @@
                                 <td>@issue.Status</td>
                                 <td>@issue.EstimatedTime</td>
                                 <td>@issue.WorkedTime</td>
-                                <td>@issue.DueDate</td>
+                                <td>@issue.DueDate?.ToShortDateString()</td>
                             </tr>
                         }
                     </tbody>
@@ -84,14 +87,16 @@
             </ChildContent>
         </MudExpansionPanel>
     }
+
+    <MudButton>Add new task</MudButton>
 </MudExpansionPanels>
 
 
 @code {
-    private string[] StatusNames = new[] { "To do", "Not ready", "In work", "Completed" };
     private readonly string AllProjectsButtonText = "All projects";
     private readonly int CurrentPage = 1;
     private readonly int RowsPerPage = 10;
+
     
     private bool AssignedToMeOnly = false;
 
@@ -108,7 +113,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Issues = new List<Issue> { new Issue() { Status = "To do", Assignee = "Hlib Pivniev" }, new Issue() { Status = "To do" }, new Issue() { Status = "To do", Project = new Stroom.Shared.Models.Project() { Name = "test" } }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Not ready" }, new Issue() { Status = "Completed" }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
+        Issues = new List<Issue> { new Issue() { Status = BugStatus.New, Assignee = "Hlib Pivniev" }, new Issue() { Status = BugStatus.New }, new Issue() { Status = BugStatus.New, Project = new Stroom.Shared.Models.ProjectDto() { Name = "test" } }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Completed }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
     }
 
     public bool _isOpen;
