@@ -1,12 +1,15 @@
 ﻿@page "/bugs"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Client.Services
 @using Stroom.Shared
 @using Stroom.Shared.Enums
 @using Stroom.Shared.Models
 @using static Stroom.Shared.Enums.BugPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
+@inject IProjectsService ProjectsService
+@inject IBugsService BugsService
 
 <PageTitle>Bugs</PageTitle>
 
@@ -42,9 +45,10 @@
     </div>
     @foreach(var statusName in BugPropertiesEnums.BugStatuses)
     {
-        var issuesFiltered = Issues.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
+        var issuesFiltered = AllBugs.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
         var issuesCount = issuesFiltered.Count;
         if (issuesCount < 1) continue;
+        ProjectHasAnyBugsAssigned = true;
 
         <MudExpansionPanel Class="mb-3">
              <TitleContent>
@@ -73,8 +77,8 @@
                         {
                             <tr>
                                 <td>@issue.Project.Name</td>
-                                <td>@issue.IssueID</td>
-                                <td><a href="project/new" Style="font-weight: 500; color: blue;">@issue.Name</a></td>
+                                <td>@issue.BugID</td>
+                                <td><a href="@($"bugs/{issue.BugID}")" Style="font-weight: 500; color: blue;">@issue.Name</a></td>
                                 <td>@issue.Priority</td>
                                 <td>@issue.Status</td>
                                 <td>@issue.EstimatedTime</td>
@@ -87,8 +91,14 @@
             </ChildContent>
         </MudExpansionPanel>
     }
+    @if (!ProjectHasAnyBugsAssigned)
+    {
+        <MudText>There are none at the moment :) 
+            But you can always add a new bug by clicking button bellow
+        </MudText>
+    }
 
-    <MudButton>Add new task</MudButton>
+    <MudButton href="/bug-add-new">Add new bug</MudButton>
 </MudExpansionPanels>
 
 
@@ -97,23 +107,24 @@
     private readonly int CurrentPage = 1;
     private readonly int RowsPerPage = 10;
 
-    
+    private bool ProjectHasAnyBugsAssigned = false;
     private bool AssignedToMeOnly = false;
+    private bool ShowAllProject = true;
 
+    private string SelectedProjectName = "All projects";
     private string CurrentUserName = "Emma Wills"; //todo: parse somehow current user name
     private string SearchString = "";
 
-    private int PagesCount => (int) (Math.Ceiling(((double)Issues.Count() / (double)RowsPerPage)));
+    private int PagesCount => (int) (Math.Ceiling(((double)AllBugs.Count() / (double)RowsPerPage)));
 
-    private IEnumerable<Issue> Issues = new List<Issue>();
-    private IEnumerable<string> ProjectNames => Issues.Select(i => i.Project.Name).Distinct().ToList();
-    private bool ShowAllProject = true;
-    private string SelectedProjectName = "All projects";
+    private IEnumerable<Bug> AllBugs = new List<Bug>();
+    private IEnumerable<string> ProjectNames = new List<string>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        Issues = new List<Issue> { new Issue() { Status = BugStatus.New, Assignee = "Hlib Pivniev" }, new Issue() { Status = BugStatus.New }, new Issue() { Status = BugStatus.New, Project = new Stroom.Shared.Models.ProjectDto() { Name = "test" } }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Ongoing }, new Issue() { Status = BugStatus.Completed }, new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
+        AllBugs = await BugsService.GetAsync();
+        ProjectNames = (await ProjectsService.GetAsync()).Select(result => result.Name).ToList();
     }
 
     public bool _isOpen;
@@ -128,18 +139,19 @@
 
     public void SelectProject(string projectName)
     {
-        ShowAllProject = (projectName == "All projects");
+        ShowAllProject = (projectName == AllProjectsButtonText);
         SelectedProjectName = projectName;
         _isOpen = false;
+        ProjectHasAnyBugsAssigned = false;
     }
 
-    private bool FilterFunc(Issue issue)
+    private bool FilterFunc(Bug issue)
     {
         if (string.IsNullOrWhiteSpace(SearchString))
             return true;
         if (issue.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (issue.IssueID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+        if (issue.BugID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }

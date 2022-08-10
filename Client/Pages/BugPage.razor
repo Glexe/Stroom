@@ -1,27 +1,28 @@
-﻿@page "/projects/{ProjectName}"
+﻿@page "/bugs/{BugID:int}"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Shared
 @using Stroom.Shared.Models
+@using Stroom.Client.Components
 @using static Stroom.Shared.Enums.BugPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
 
-<PageTitle>@ProjectName</PageTitle>
+<PageTitle>@Bug.Name</PageTitle>
 
-<div style="@(!IsOpen ? "visibility: hidden; width: 0; height: 0;" : "")">
-    <BugForm @bind-Bug="Issue" />
+<div style="@(!IsEditFormOpen ? "visibility: hidden; width: 0; height: 0;" : "")">
+    <BugForm @bind-Bug="Bug" />
     <MudStack Row="true" Class="mt-4">
         <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
         <MudButton OnClick="Save" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
     </MudStack>
 </div>
 
-<MudStack Style="@(IsOpen ? "visibility: hidden;" : "")">
+<MudStack Style="@(IsEditFormOpen ? "visibility: hidden;" : "")">
     <MudPaper Class="pa-4">
-        <MudText Typo="Typo.subtitle2">@ProjectName / Task ID - @Issue.IssueID</MudText>
+        <MudText Typo="Typo.subtitle2">@Bug.Project.Name / Task ID - @Bug.BugID</MudText>
         <span>
-            <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@Issue.Name</MudText>
+            <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@Bug.Name</MudText>
             <div style="float: right;">
                 <MudButton OnClick="ToggleOpen">Edit</MudButton>
                 <MudButton>Add hours</MudButton>
@@ -33,19 +34,19 @@
                 <MudStack Spacing="4">
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Status:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.Status</MudText>
+                        <MudText Typo="Typo.body2">@Bug.Status</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Priority:</MudText>
-                        <MudText Typo="Typo.body2" >@Issue.Priority</MudText>
+                        <MudText Typo="Typo.body2" >@Bug.Priority</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Owner:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.Owner</MudText>
+                        <MudText Typo="Typo.body2">@Bug.Owner</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Assignee:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.Assignee</MudText>
+                        <MudText Typo="Typo.body2">@Bug.Assignee</MudText>
                     </MudStack>
                 </MudStack>
             </MudItem>
@@ -53,19 +54,19 @@
                 <MudStack Spacing="4">
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Submition Date:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.SubmitionDate?.ToShortDateString()</MudText>
+                        <MudText Typo="Typo.body2">@Bug.SubmitionDate?.ToShortDateString()</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Due Date:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.DueDate?.ToShortDateString()</MudText>
+                        <MudText Typo="Typo.body2">@Bug.DueDate?.ToShortDateString()</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Estimated Time:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.EstimatedTime h</MudText>
+                        <MudText Typo="Typo.body2">@Bug.EstimatedTime h</MudText>
                     </MudStack> 
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Worked Time:</MudText>
-                        <MudText Typo="Typo.body2">@Issue.WorkedTime h</MudText>
+                        <MudText Typo="Typo.body2">@Bug.WorkedTime h</MudText>
                     </MudStack>
                 </MudStack>
             </MudItem>
@@ -74,61 +75,66 @@
         <MudDivider Class="my-3" />
         <MudStack>
             <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Description:</MudText>
-            <MudText Typo="Typo.body2">@Issue.Description h</MudText>
+            <MudText Typo="Typo.body2">@Bug.Description h</MudText>
         </MudStack>
     </MudPaper>
 
+    <MudPaper>
+        <MudTextField Class="d-inline" ErrorText="Comment cannot be empty" Error="@NewCommentHasErrors" @bind-Value="NewCommentText" Immediate="true" Label="Comment" Lines="4" />
+    </MudPaper>
+
+    <button class="btn btn-primary" @onclick="AddComment">Add comment</button>
+
     <button class="btn btn-primary" @onclick="FlipSortDirection">New at the <b>@(OrderCommentsDescending ? "Top" : "Bottom")</b></button>
-    @for (var i = 0; i < UserComments.Count; i++)
+    @for (var i = 0; i < Bug.Comments.Count; i++)
     {
-        var userComment = UserComments[i];
-        var commentNumber = OrderCommentsDescending ? UserComments.Count - i : i + 1;
+        var comment = Bug.Comments[i];
+        var commentNumber = OrderCommentsDescending ? Bug.Comments.Count - i : i + 1;
         <MudPaper Class="pa-4">
             <span class="width: 100%;">
-                <MudText Typo="Typo.caption">#@commentNumber @userComment.User.Name @userComment.User.Surname</MudText>
-                <MudText Typo="Typo.caption" Style="float: right;">@userComment.TimeStamp.ToString("dd-MM-yyyy H:mm")</MudText>
+                <MudText Typo="Typo.caption">#@commentNumber @comment.User.Name @comment.User.Surname</MudText>
+                <MudText Typo="Typo.caption" Style="float: right;">@comment.TimeStamp.ToString("dd-MM-yyyy H:mm")</MudText>
             </span>
-            <MudText Typo="Typo.body1">@userComment.Comment</MudText>
+            <MudText Typo="Typo.body1">@comment.Comment</MudText>
         </MudPaper>
     }
 </MudStack>
 
 @code {
-    [Parameter]
-    public string ProjectName { get; set; }
-    private Issue Issue { get; set; }
-    private List<UserComment> UserComments;
-    private UserComment _UserComment;
-    public bool IsOpen { get; set; } = false;
+    [Parameter] public int BugID { get; set; }
 
-    private bool OrderCommentsDescending = true;
+    private Bug Bug { get; set; }
+
+    private bool IsEditFormOpen { get; set; } = false;
+    private bool NewCommentHasErrors { get; set; } = false;
+    private bool OrderCommentsDescending { get; set; } = true;
+
+    private string NewCommentText;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
 
 
     protected override async Task OnInitializedAsync()
     {
-        var userComment = new UserComment();
-
-        _UserComment = userComment;
-        Issue = userComment.Issue;
-        UserComments = new List<UserComment>()
+        Bug = new Bug();
+        Bug.Comments = new List<BugComment>()
         {
-            new UserComment(),
-            new UserComment(),
-            new UserComment(),
-            new UserComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
-            new UserComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
+            new BugComment(),
+            new BugComment(),
+            new BugComment(),
+            new BugComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
+            new BugComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
         }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
     }
 
     private void FlipSortDirection(){
         OrderCommentsDescending = !OrderCommentsDescending;
-        UserComments = UserComments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
     }
 
     private void ToggleOpen() 
     {
-        IsOpen = !IsOpen; 
+        IsEditFormOpen = !IsEditFormOpen;
+        if (!IsEditFormOpen) NewCommentHasErrors = false;
     }
 
     private void Cancel()
@@ -140,5 +146,15 @@
     {
         //Save bug changes
         ToggleOpen();
+    }
+
+    private void AddComment()
+    {
+        NewCommentHasErrors = string.IsNullOrWhiteSpace(NewCommentText);
+        if (NewCommentHasErrors) return;
+
+        Bug.Comments.Add(new BugComment() { TimeStamp = DateTime.Now, Comment = NewCommentText });
+        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        NewCommentText = "";
     }
 }

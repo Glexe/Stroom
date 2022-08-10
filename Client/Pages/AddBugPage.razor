@@ -1,0 +1,50 @@
+﻿@page "/bugs/new"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Shared
+@using Stroom.Shared.Models
+@using Stroom.Client.Components
+@using static Stroom.Shared.Enums.BugPropertiesEnums
+@attribute [Authorize]
+@inject HttpClient Http
+
+<PageTitle>Add new bug</PageTitle>
+
+<div>
+    <BugForm @bind-Bug="Bug" />
+    <MudStack Row="true" Class="mt-4">
+        <MudButton Href="/" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
+        <MudButton OnClick="Save" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
+    </MudStack>
+</div>
+
+@code {
+    private Bug Bug { get; set; }
+
+    private bool OrderCommentsDescending = true;
+    private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Bug = new Bug();
+        Bug.Comments = new List<BugComment>()
+        {
+            new BugComment(),
+            new BugComment(),
+            new BugComment(),
+            new BugComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
+            new BugComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
+        }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+    }
+
+    private void FlipSortDirection(){
+        OrderCommentsDescending = !OrderCommentsDescending;
+        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+    }
+
+    private void Save()
+    {
+        
+    }
+}

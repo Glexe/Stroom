@@ -8,8 +8,8 @@ namespace Stroom.Shared.Models
 {
     public class ProjectDto
     {
-        public string Name { get; set; } = "Mars colony";
-        public IEnumerable<Issue> AssignedIssues;
+        public string Name { get; set; } = "Moon colony";
+        public IEnumerable<Bug> AssignedIssues;
 
         public override bool Equals(object o)
         {

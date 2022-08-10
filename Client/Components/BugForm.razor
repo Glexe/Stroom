@@ -84,9 +84,9 @@
 </MudStack>
 
 @code {
-    private Issue _Bug = new Issue();
+    private Bug _Bug = new Bug();
     [Parameter]
-    public Issue Bug 
+    public Bug Bug 
     {
         get => _Bug;
         set
@@ -98,7 +98,7 @@
         }
     }
     [Parameter]
-    public EventCallback<Issue> BugChanged { get; set; }
+    public EventCallback<Bug> BugChanged { get; set; }
 
     private ProjectDto[]? Projects { get; set; }
 

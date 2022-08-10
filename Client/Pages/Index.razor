@@ -1,9 +1,12 @@
 ﻿@page "/"
+@using Stroom.Client.Services
 @using Stroom.Shared.Models
+@inject IBugsService BugsService
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
 <PageTitle>Index</PageTitle>
 
-<MudTable Items="@Issues" Hover="true" Filter="new Func<Issue,bool>(FilterFunc)" CurrentPage="@(currentPage - 1)" @bind-RowsPerPage="@rowsPerPage">
+<MudTable Items="@BugsAssignedToUser" Hover="true" Filter="new Func<Bug,bool>(FilterFunc)" CurrentPage="@(currentPage - 1)" @bind-RowsPerPage="@rowsPerPage">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Issues</MudText>
         <MudPagination Class="pa-4 mx-auto" Color="Color.Primary" Count="@pagesCount" @bind-Selected="@currentPage"/>
@@ -11,19 +14,19 @@
         <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.Project)">Project</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.IssueID)">IssueID</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.Name)">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.Priority)">Priority</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.Status)">Status</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.EstimatedTime)">EstimatedTime</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Issue, object>(issue => issue.WorkedTime)">WorkedTime</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<Issue, object>(issue => issue.DueDate)">DueDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.Project)">Project</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.BugID)">IssueID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.Name)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.Priority)">Priority</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.Status)">Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.EstimatedTime)">EstimatedTime</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<Bug, object>(issue => issue.WorkedTime)">WorkedTime</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<Bug, object>(issue => issue.DueDate)">DueDate</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Project">@context.Project.Name</MudTd>
-        <MudTd DataLabel="IssueID">@context.IssueID</MudTd>
-        <MudTd DataLabel="Name"><a href="project/new" Style="font-weight: 500; color: blue;">@context.Name</a></MudTd>
+        <MudTd DataLabel="IssueID">@context.BugID</MudTd>
+        <MudTd DataLabel="Name"><a href="@($"bugs/{context.BugID}")" Style="font-weight: 500; color: blue;">@context.Name</a></MudTd>
         <MudTd DataLabel="Priority">@context.Priority</MudTd>
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="EstimatedTime">@context.EstimatedTime h</MudTd>
@@ -35,29 +38,38 @@
     </PagerContent>
 </MudTable>
 
+<MudButton OnClick="@test">test</MudButton>
+
 @code {
     private string searchString = "";
     private int currentPage = 1;
     private int rowsPerPage = 10;
 
-    private int pagesCount => (int) (Math.Ceiling(((double)Issues.Count() / (double)rowsPerPage)));
-    
-    private IEnumerable<Issue> Issues = new List<Issue>();
+    private int pagesCount => (int) (Math.Ceiling(((double)BugsAssignedToUser.Count() / (double)rowsPerPage)));
+
+    private IEnumerable<Bug> BugsAssignedToUser = new List<Bug>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        Issues = new List<Issue> { new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(), new Issue(){Name = "test 2nd page"}, new Issue() };
+        BugsAssignedToUser = await BugsService.GetAsync();
     }
 
-    private bool FilterFunc(Issue issue)
+    private bool FilterFunc(Bug issue)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         if (issue.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (issue.IssueID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (issue.BugID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    private void test()
+    {
+        var authstate = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+        var user = authstate.User;
+        var name = user.Identity.Name;
     }
 }

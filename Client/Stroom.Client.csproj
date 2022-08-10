@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Shared\Stroom.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\" />
-  </ItemGroup>
-
 </Project>

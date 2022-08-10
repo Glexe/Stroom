@@ -1,18 +1,20 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Newtonsoft.Json
+@using Stroom.Client.Services
 @using Stroom.Shared.Models
 @using static System.Net.WebRequestMethods
 @inject NavigationManager NavManager
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IProjectsService ProjectsService
 
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">My Page</MudNavLink>
     <MudNavLink Href="/bugs" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.BugReport">Bugs</MudNavLink>
     <MudNavGroup Title="Projects" Icon="@Icons.Outlined.Workspaces" Expanded="true">
         <MudNavLink Href="/projects/new" Icon="@Icons.Filled.Add">Add new</MudNavLink>
-        @foreach(var project in projects)
+        @foreach(var project in Projects)
         {
             <MudNavLink Href="@($"projects/{project.Name}")">@project.Name</MudNavLink>
         }
@@ -23,13 +25,13 @@
 
 
 @code {
-    private ProjectDto[] projects = new ProjectDto[0];
+    private IEnumerable<ProjectDto> Projects = new List<ProjectDto>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            //projects = await Http.GetFromJsonAsync<Project[]>("Project");
+            Projects = await ProjectsService.GetAsync();
         }
         catch (AccessTokenNotAvailableException exception)
         {

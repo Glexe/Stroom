@@ -14,7 +14,7 @@
     <MudButton Style="font-weight: 500;" OnClick="@ToggleOpen">Close</MudButton>
     <MudStack>
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.subtitle2">@ProjectName / Task ID - @_Issue.IssueID</MudText>
+            <MudText Typo="Typo.subtitle2">@ProjectName / Task ID - @_Issue.BugID</MudText>
         </MudPaper>
     
         <MudPaper Class="pa-4">
@@ -92,9 +92,9 @@
 
     public bool IsOpen { get; set; }
 
-    private List<UserComment> UserComments;
-    private UserComment _UserComment;
-    private Issue _Issue;
+    private List<BugComment> UserComments;
+    private BugComment _UserComment;
+    private Bug _Issue;
 
     private bool OrderCommentsDescending = true;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
@@ -102,17 +102,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var userComment = new UserComment();
+        var userComment = new BugComment();
 
         _UserComment = userComment;
         _Issue = userComment.Issue;
-        UserComments = new List<UserComment>()
+        UserComments = new List<BugComment>()
         {
-            new UserComment(),
-            new UserComment(),
-            new UserComment(),
-            new UserComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
-            new UserComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
+            new BugComment(),
+            new BugComment(),
+            new BugComment(),
+            new BugComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
+            new BugComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
         }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
     }
 
