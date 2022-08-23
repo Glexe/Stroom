@@ -19,6 +19,11 @@
 <PageTitle>Index</PageTitle>
 
 
+<TasksDashboard @bind-Tasks="TasksAssignedToUser" />
+
+<MudDivider Class="my-8" />
+
+<TimeEntriesDashboard @bind-TimeEntries="CurrentUser.TimeEntries"/>
 
 
 @code {

@@ -1,4 +1,4 @@
-﻿using Stroom.Shared.Models;
+﻿ using Stroom.Shared.Models;
 using System.Net.Http.Json;
 
 namespace Stroom.Client.Services
