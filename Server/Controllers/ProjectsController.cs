@@ -24,7 +24,13 @@ namespace Stroom.Server.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<ProjectDto>> Get()
         {
-            return Ok(ProjectsRepository.GetProjects());
+            return Ok(ProjectsRepository.Get());
+        }
+
+        [HttpGet("{projectId}")]
+        public ActionResult<ProjectDto> Get(int projectId)
+        {
+            return Ok(ProjectsRepository.Get(projectId));
         }
     }
 }

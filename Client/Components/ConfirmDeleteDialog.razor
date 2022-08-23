@@ -1,0 +1,27 @@
+﻿@using Stroom.Shared.Models
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Do you really want to remove user <b>@User.Name</b> from project <b>@Project.Name</b>? This process cannot be undone.</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Remove">Remove</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public ProjectDto Project { get; set; }
+    [Parameter] public User User { get; set; }
+
+    private void Remove()
+    {
+        //projectsRepo.RemoveUser(userId,projectId);
+        //delete from user_project where us_id = userId and pr_id = projectId
+        //SaveChanges();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    private void Cancel() => MudDialog.Cancel();
+}

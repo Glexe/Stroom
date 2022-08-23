@@ -20,13 +20,13 @@
     <MudPaper Class="pa-4">
         <MudTextField Required="true" Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5" @bind-Value="Task.Name" Immediate="true" Label="Name"/>
         <MudStack Row="true" Spacing="8">
-            <MudSelect Required="true" T="TaskDto" @bind-Value="Task.Project" Label="Project" AnchorOrigin="Origin.BottomCenter">
+            <MudSelect Required="true" T="ProjectDto" @bind-Value="Task.Project" Label="Project" AnchorOrigin="Origin.BottomCenter">
             @{
                 if(Projects != null && Projects.Any())
                 { 
                     foreach (var project in Projects)
                     {
-                                <MudSelectItem Value="@project" />
+                        <MudSelectItem Value="@project" />
                     }
                 }
             }

@@ -20,7 +20,7 @@ namespace Stroom.Shared.Models
         public float WorkedTime => TimeEntries?.Sum(timeEntry => timeEntry.Hours) ?? 0;
         public DateTime? SubmitionDate { get; set; } = DateTime.Today;
         public DateTime? DueDate { get; set; } = DateTime.Today.AddDays(1);
-        public TaskDto Project { get; set; } = new TaskDto();
+        public ProjectDto Project { get; set; } = new ProjectDto();
         public virtual List<CommentDto> Comments { get; set; } = new List<CommentDto>();
         public virtual List<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
     }

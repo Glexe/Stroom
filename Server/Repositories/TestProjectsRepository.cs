@@ -6,32 +6,32 @@ namespace Stroom.Server.Repositories
     {
         private readonly List<ProjectDto> TestProjects = new()
         {
-            new ProjectDto(){ Name = "Moon colony" },
-            new ProjectDto(){ Name = "Venus expedition" },
-            new ProjectDto(){ Name = "Mars terraforming" }
+            new ProjectDto(){ ProjectID = 1, Name = "Moon colony" },
+            new ProjectDto(){ ProjectID = 2, Name = "Venus expedition" },
+            new ProjectDto(){ ProjectID = 3, Name = "Mars terraforming" }
         };
 
-        public ProjectDto AddProject(ProjectDto projectDto)
+        public ProjectDto Add(ProjectDto projectDto)
         {
             throw new NotImplementedException();
         }
 
-        public ProjectDto DeleteProject(int projectId)
+        public ProjectDto Delete(int projectId)
         {
             throw new NotImplementedException();
         }
 
-        public ProjectDto GetProject(int projectId)
+        public ProjectDto Get(int projectId)
         {
-            throw new NotImplementedException();
+            return TestProjects.FirstOrDefault(project => project.ProjectID == projectId);
         }
 
-        public IEnumerable<ProjectDto> GetProjects()
+        public IEnumerable<ProjectDto> Get()
         {
             return TestProjects;
         }
 
-        public ProjectDto ModifyProject(int projectId, ProjectDto projectDto)
+        public ProjectDto Modify(int projectId, ProjectDto projectDto)
         {
             throw new NotImplementedException();
         }

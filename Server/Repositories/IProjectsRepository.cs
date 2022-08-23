@@ -4,11 +4,11 @@ namespace Stroom.Server.Repositories
 {
     public interface IProjectsRepository
     {
-        public IEnumerable<ProjectDto> GetProjects();
-        public ProjectDto GetProject(int projectId);
-        public ProjectDto DeleteProject (int projectId);
-        public ProjectDto AddProject(ProjectDto projectDto);
-        public ProjectDto ModifyProject(int projectId, ProjectDto projectDto);
+        public IEnumerable<ProjectDto> Get();
+        public ProjectDto Get(int projectId);
+        public ProjectDto Delete (int projectId);
+        public ProjectDto Add(ProjectDto projectDto);
+        public ProjectDto Modify(int projectId, ProjectDto projectDto);
         public bool SaveChanges();
     }
 }

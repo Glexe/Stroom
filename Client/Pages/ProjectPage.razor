@@ -10,19 +10,100 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject ITasksService TasksService
+@inject IProjectsService ProjectsService
+@inject IDialogService DialogService
+
+<style>
+    .href-text {
+        font-weight: 500;
+        color: blue;
+    }
+
+    .href-text:hover {
+        text-decoration: underline;
+    }
+</style>
 
 @if(Project != null)
 {
-<PageTitle>@Project.Name</PageTitle>
-
-<TasksDashboard @bind-Tasks="TasksAssignedToUser" />
+    <PageTitle>@Project.Name</PageTitle>
     
+    <MudStack Row="true" Spacing="4">
+        <MudItem Style="width: 50%; float: left;">
+            <MudTable Items="@TasksAssignedToUser" Hover="true" CurrentPage="@(CurrentPage - 1)" @bind-RowsPerPage="@RowsPerPage">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Tasks</MudText>
+                    <MudPagination Class="pa-4 mx-auto" Color="Color.Primary" Count="@PagesCount" @bind-Selected="@CurrentPage"/>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.TaskID)">TaskID</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Priority)">Priority</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Status)">Status</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.EstimatedTime)">EstimatedTime</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.WorkedTime)">WorkedTime</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<TaskDto, object>(task => task.DueDate)">DueDate</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="TaskID"><a href="@($"tasks/{context.TaskID}")" Class="href-text">@context.TaskID</a></MudTd>
+                    <MudTd DataLabel="Name"><a href="@($"tasks/{context.TaskID}")" Class="href-text">@context.Name</a></MudTd>
+                    <MudTd DataLabel="Priority">@context.Priority</MudTd>
+                    <MudTd DataLabel="Status">@context.Status</MudTd>
+                    <MudTd DataLabel="EstimatedTime">@context.EstimatedTime h</MudTd>
+                    <MudTd DataLabel="WorkedTime">@context.WorkedTime h</MudTd>
+                    <MudTd DataLabel="DueDate">@context.DueDate?.ToShortDateString()</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>
+                </PagerContent>
+            </MudTable>
+        </MudItem>
+    
+        <MudDivider Vertical="true" />
+    
+        <MudItem Style="width: 50%; float: right;">
+            <MudTable Items="@Users" Hover="true" CurrentPage="@(CurrentPage2 - 1)" @bind-RowsPerPage="@RowsPerPage2">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Users</MudText>
+                    <MudPagination Class="pa-4 mx-auto" Color="Color.Primary" Count="@PagesCount2" @bind-Selected="@CurrentPage2"/>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<User, object>(user => user.Surname)">Surname</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Email)">Email</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Role.ToString())">Role</MudTableSortLabel></MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Surname">@context.Surname</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Role">@context.Role</MudTd>
+                    <MudTd DataLabel="Actions"><MudButton OnClick="@(async () => await RemoveUser(@context))" Variant="Variant.Filled" Color="Color.Error">Remove</MudButton></MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>
+                </PagerContent>
+            </MudTable>
+            <MudStack Row="true" Class="mt-4">
+                <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Add</MudButton>
+            </MudStack>
+        </MudItem>
+    </MudStack>
 }
 
 @code {
     [Parameter] public int ProjectID { get; set; }
 
+    private int CurrentPage = 1;
+    private int CurrentPage2 = 1;
+    private int RowsPerPage = 10;
+    private int RowsPerPage2 = 10;
+    private int PagesCount => (int) (Math.Ceiling(((double)TasksAssignedToUser.Count() / (double)RowsPerPage)));
+    private int PagesCount2 => (int) (Math.Ceiling(((double)Users.Count() / (double)RowsPerPage2)));
+
     private IEnumerable<TaskDto> TasksAssignedToUser = new List<TaskDto>();
+    private List<User> Users = new List<User>();
 
     private ProjectDto Project { get; set; }
     private TimeEntry NewTimeEntry { get; set; } = new TimeEntry();
@@ -38,5 +119,25 @@
     protected override async Task OnInitializedAsync()
     {
         TasksAssignedToUser = await TasksService.GetAsync();
+        Project = await ProjectsService.GetAsync(ProjectID);
+        Users = new List<User>()
+        {
+            new User()
+        };
+        Console.WriteLine(1);
+    }
+
+    private async Task RemoveUser(User user)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("User", user);
+        parameters.Add("Project", Project);
+
+        var res = await DialogService.Show<ConfirmDeleteDialog>("Remove", parameters, options).Result;
+        if (!res.Cancelled)
+        {
+            Users.Remove(user);
+        }
     }
 }

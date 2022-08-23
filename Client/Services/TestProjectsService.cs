@@ -16,5 +16,10 @@ namespace Stroom.Client.Services
         {
             return await Client.GetFromJsonAsync<ProjectDto[]>("api/Projects");
         }
+
+        public async Task<ProjectDto> GetAsync(int projectId)
+        {
+            return await Client.GetFromJsonAsync<ProjectDto>($"api/Projects/{projectId}");
+        }
     }
 }
