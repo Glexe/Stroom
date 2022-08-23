@@ -1,22 +1,31 @@
-﻿@page "/bugs"
+﻿@page "/tasks"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Client.Services
 @using Stroom.Shared
 @using Stroom.Shared.Enums
 @using Stroom.Shared.Models
-@using static Stroom.Shared.Enums.BugPropertiesEnums
+@using static Stroom.Shared.Enums.TaskPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
 @inject IProjectsService ProjectsService
-@inject IBugsService BugsService
+@inject ITasksService TasksService
 
-<PageTitle>Bugs</PageTitle>
+<PageTitle>Tasks</PageTitle>
 
 <style>
     .flex-bottom{
         display: flex;
         align-items: flex-end;
+    }
+
+    .href-text {
+    font-weight: 500;
+    color: blue;
+}
+
+    .href-text:hover {
+        text-decoration: underline;
     }
 </style>
 
@@ -43,19 +52,19 @@
             <MudText Style="@(AssignedToMeOnly ? "font-weight: 500;" : "font-weight: 400;")">Assigned to me</MudText>
         </MudStack>
     </div>
-    @foreach(var statusName in BugPropertiesEnums.BugStatuses)
+    @foreach(var statusName in TaskPropertiesEnums.TaskStatuses)
     {
-        var issuesFiltered = AllBugs.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
-        var issuesCount = issuesFiltered.Count;
-        if (issuesCount < 1) continue;
-        ProjectHasAnyBugsAssigned = true;
+        var tasksFiltered = AllTasks.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
+        var tasksCount = tasksFiltered.Count;
+        if (tasksCount < 1) continue;
+        ProjectHasAnyTasksAssigned = true;
 
         <MudExpansionPanel Class="mb-3">
              <TitleContent>
                     <div class="flex-bottom">
                         <MudIcon Icon="@Icons.Filled.KeyboardArrowDown" class="mr-3"></MudIcon>
                         <MudText class="mr-3" Style="font-weight: 500;">@statusName</MudText>
-                        <MudText Typo="Typo.caption">@issuesCount tasks</MudText>
+                        <MudText Typo="Typo.caption">@tasksCount tasks</MudText>
                     </div>
                 </TitleContent>
             <ChildContent>
@@ -63,7 +72,7 @@
                     <thead>
                         <tr>
                             <th>Project</th>
-                            <th>IssueID</th>
+                            <th>TaskID</th>
                             <th>Name</th>
                             <th>Priority</th>
                             <th>Status</th>
@@ -73,17 +82,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var issue in issuesFiltered)
+                        @foreach (var task in tasksFiltered)
                         {
                             <tr>
-                                <td>@issue.Project.Name</td>
-                                <td>@issue.BugID</td>
-                                <td><a href="@($"bugs/{issue.BugID}")" Style="font-weight: 500; color: blue;">@issue.Name</a></td>
-                                <td>@issue.Priority</td>
-                                <td>@issue.Status</td>
-                                <td>@issue.EstimatedTime</td>
-                                <td>@issue.WorkedTime</td>
-                                <td>@issue.DueDate?.ToShortDateString()</td>
+                                <td>@task.Project.Name</td>
+                                <td><a href="@($"tasks/{task.TaskID}")" class="href-text">@task.TaskID</a></td>
+                                <td><a href="@($"tasks/{task.TaskID}")" class="href-text">@task.Name</a></td>
+                                <td>@task.Priority</td>
+                                <td>@task.Status</td>
+                                <td>@task.EstimatedTime</td>
+                                <td>@task.WorkedTime</td>
+                                <td>@task.DueDate?.ToShortDateString()</td>
                             </tr>
                         }
                     </tbody>
@@ -91,14 +100,14 @@
             </ChildContent>
         </MudExpansionPanel>
     }
-    @if (!ProjectHasAnyBugsAssigned)
+    @if (!ProjectHasAnyTasksAssigned)
     {
         <MudText>There are none at the moment :) 
-            But you can always add a new bug by clicking button bellow
+            But you can always add a new task by clicking a button bellow
         </MudText>
     }
 
-    <MudButton href="/bug-add-new">Add new bug</MudButton>
+    <MudButton href="/tasks/new">Add new task</MudButton>
 </MudExpansionPanels>
 
 
@@ -107,7 +116,7 @@
     private readonly int CurrentPage = 1;
     private readonly int RowsPerPage = 10;
 
-    private bool ProjectHasAnyBugsAssigned = false;
+    private bool ProjectHasAnyTasksAssigned = false;
     private bool AssignedToMeOnly = false;
     private bool ShowAllProject = true;
 
@@ -115,15 +124,15 @@
     private string CurrentUserName = "Emma Wills"; //todo: parse somehow current user name
     private string SearchString = "";
 
-    private int PagesCount => (int) (Math.Ceiling(((double)AllBugs.Count() / (double)RowsPerPage)));
+    private int PagesCount => (int) (Math.Ceiling(((double)AllTasks.Count() / (double)RowsPerPage)));
 
-    private IEnumerable<Bug> AllBugs = new List<Bug>();
+    private IEnumerable<TaskDto> AllTasks = new List<TaskDto>();
     private IEnumerable<string> ProjectNames = new List<string>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        AllBugs = await BugsService.GetAsync();
+        AllTasks = await TasksService.GetAsync();
         ProjectNames = (await ProjectsService.GetAsync()).Select(result => result.Name).ToList();
     }
 
@@ -142,16 +151,16 @@
         ShowAllProject = (projectName == AllProjectsButtonText);
         SelectedProjectName = projectName;
         _isOpen = false;
-        ProjectHasAnyBugsAssigned = false;
+        ProjectHasAnyTasksAssigned = false;
     }
 
-    private bool FilterFunc(Bug issue)
+    private bool FilterFunc(TaskDto task)
     {
         if (string.IsNullOrWhiteSpace(SearchString))
             return true;
-        if (issue.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+        if (task.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (issue.BugID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+        if (task.TaskID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }

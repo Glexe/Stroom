@@ -1,31 +1,54 @@
-﻿@page "/bugs/{BugID:int}"
+﻿@page "/tasks/{TaskID:int}"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Client.Services
 @using Stroom.Shared
 @using Stroom.Shared.Models
 @using Stroom.Client.Components
-@using static Stroom.Shared.Enums.BugPropertiesEnums
+@using static Stroom.Shared.Enums.TaskPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ITasksService TasksService
 
-<PageTitle>@Bug.Name</PageTitle>
+@if(Task != null)
+{
+<PageTitle>@Task.Name</PageTitle>
 
 <div style="@(!IsEditFormOpen ? "visibility: hidden; width: 0; height: 0;" : "")">
-    <BugForm @bind-Bug="Bug" />
+    <TaskForm @bind-Task="Task" />
     <MudStack Row="true" Class="mt-4">
-        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
-        <MudButton OnClick="Save" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
+        <MudButton OnClick="CancelEditFormChanges" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
+        <MudButton OnClick="SaveEditFormChanges" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
     </MudStack>
 </div>
 
-<MudStack Style="@(IsEditFormOpen ? "visibility: hidden;" : "")">
+<div style="@(!IsHoursFormOpen ? "visibility: hidden; width: 0; height: 0;" : "")">
+    <MudPaper Outlined="true" Class="pa-4">
+        <MudDatePicker Required="true" @bind-Date="NewTimeEntry.Date"  Label="Date" DisableToolbar="true" />
+        <MudTooltip Color="Color.Transparent" Placement="Placement.Bottom">
+            <ChildContent>
+                <MudNumericField Required="true" @bind-Value="NewTimeEntry.Hours" Label="Hours" Variant="Variant.Text" Min="1" Max="99999" />
+            </ChildContent>
+            <TooltipContent>
+                <MudAlert Severity="Severity.Info" Dense="true">Tip: Use shift + mouse wheel to adjust the number</MudAlert>
+            </TooltipContent>
+        </MudTooltip>
+    </MudPaper>
+    <MudStack Row="true" Class="mt-4">
+        <MudButton OnClick="CancelHoursFormChanges" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
+        <MudButton OnClick="SaveHoursFormChanges" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
+    </MudStack>
+</div>
+
+<MudStack Style="@((IsEditFormOpen || IsHoursFormOpen) ? "visibility: hidden;" : "")">
     <MudPaper Class="pa-4">
-        <MudText Typo="Typo.subtitle2">@Bug.Project.Name / Task ID - @Bug.BugID</MudText>
+        <MudText Typo="Typo.subtitle2">@Task.Project.Name / Task ID - @Task.TaskID</MudText>
         <span>
-            <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@Bug.Name</MudText>
+            <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@Task.Name</MudText>
             <div style="float: right;">
-                <MudButton OnClick="ToggleOpen">Edit</MudButton>
-                <MudButton>Add hours</MudButton>
+                <MudButton OnClick="ToggleOpenEditForm">Edit</MudButton>
+                <MudButton OnClick="ToggleOpenHoursForm">Add hours</MudButton>
             </div>
         </span>
         <MudDivider Class="my-3"/>
@@ -34,19 +57,19 @@
                 <MudStack Spacing="4">
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Status:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.Status</MudText>
+                        <MudText Typo="Typo.body2">@Task.Status</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Priority:</MudText>
-                        <MudText Typo="Typo.body2" >@Bug.Priority</MudText>
+                        <MudText Typo="Typo.body2" >@Task.Priority</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Owner:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.Owner</MudText>
+                        <MudText Typo="Typo.body2">@Task.Owner</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Assignee:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.Assignee</MudText>
+                        <MudText Typo="Typo.body2">@Task.Assignee</MudText>
                     </MudStack>
                 </MudStack>
             </MudItem>
@@ -54,19 +77,19 @@
                 <MudStack Spacing="4">
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Submition Date:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.SubmitionDate?.ToShortDateString()</MudText>
+                        <MudText Typo="Typo.body2">@Task.SubmitionDate?.ToShortDateString()</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Due Date:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.DueDate?.ToShortDateString()</MudText>
+                        <MudText Typo="Typo.body2">@Task.DueDate?.ToShortDateString()</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Estimated Time:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.EstimatedTime h</MudText>
+                        <MudText Typo="Typo.body2">@Task.EstimatedTime h</MudText>
                     </MudStack> 
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Worked Time:</MudText>
-                        <MudText Typo="Typo.body2">@Bug.WorkedTime h</MudText>
+                        <MudText Typo="Typo.body2"><a href="@($"tasks/{TaskID}/hours")">@Task.WorkedTime h</a></MudText>
                     </MudStack>
                 </MudStack>
             </MudItem>
@@ -75,7 +98,7 @@
         <MudDivider Class="my-3" />
         <MudStack>
             <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Description:</MudText>
-            <MudText Typo="Typo.body2">@Bug.Description h</MudText>
+            <MudText Typo="Typo.body2">@Task.Description h</MudText>
         </MudStack>
     </MudPaper>
 
@@ -86,10 +109,10 @@
     <button class="btn btn-primary" @onclick="AddComment">Add comment</button>
 
     <button class="btn btn-primary" @onclick="FlipSortDirection">New at the <b>@(OrderCommentsDescending ? "Top" : "Bottom")</b></button>
-    @for (var i = 0; i < Bug.Comments.Count; i++)
+    @for (var i = 0; i < Task.Comments.Count; i++)
     {
-        var comment = Bug.Comments[i];
-        var commentNumber = OrderCommentsDescending ? Bug.Comments.Count - i : i + 1;
+        var comment = Task.Comments[i];
+        var commentNumber = OrderCommentsDescending ? Task.Comments.Count - i : i + 1;
         <MudPaper Class="pa-4">
             <span class="width: 100%;">
                 <MudText Typo="Typo.caption">#@commentNumber @comment.User.Name @comment.User.Surname</MudText>
@@ -99,53 +122,69 @@
         </MudPaper>
     }
 </MudStack>
+}
 
 @code {
-    [Parameter] public int BugID { get; set; }
+    [Parameter] public int TaskID { get; set; }
 
-    private Bug Bug { get; set; }
+    private TaskDto Task { get; set; }
+    private TimeEntry NewTimeEntry { get; set; } = new TimeEntry();
 
     private bool IsEditFormOpen { get; set; } = false;
+    private bool IsHoursFormOpen { get; set; } = false;
     private bool NewCommentHasErrors { get; set; } = false;
     private bool OrderCommentsDescending { get; set; } = true;
 
     private string NewCommentText;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
 
-
     protected override async Task OnInitializedAsync()
     {
-        Bug = new Bug();
-        Bug.Comments = new List<BugComment>()
-        {
-            new BugComment(),
-            new BugComment(),
-            new BugComment(),
-            new BugComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
-            new BugComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
-        }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        var task = await TasksService.GetAsync(TaskID);
+        if(task is null) NavigationManager.NavigateTo("error");
+
+        Task = task;
     }
 
     private void FlipSortDirection(){
         OrderCommentsDescending = !OrderCommentsDescending;
-        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        Task.Comments = Task.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
     }
 
-    private void ToggleOpen() 
+    private void ToggleOpenEditForm() 
     {
         IsEditFormOpen = !IsEditFormOpen;
         if (!IsEditFormOpen) NewCommentHasErrors = false;
     }
 
-    private void Cancel()
+    private void ToggleOpenHoursForm() 
     {
-        ToggleOpen();
+        IsHoursFormOpen = !IsHoursFormOpen;
     }
 
-    private void Save()
+    private void CancelEditFormChanges()
     {
-        //Save bug changes
-        ToggleOpen();
+        ToggleOpenEditForm();
+    }
+
+    private void SaveEditFormChanges()
+    {
+        //Save task changes
+        ToggleOpenEditForm();
+    }
+
+    private void CancelHoursFormChanges()
+    {
+        ToggleOpenHoursForm();
+    }
+
+    private void SaveHoursFormChanges()
+    {
+        if(NewTimeEntry != null)
+            Task.TimeEntries.Add(NewTimeEntry);
+        
+        NewTimeEntry = new TimeEntry();
+        ToggleOpenHoursForm();
     }
 
     private void AddComment()
@@ -153,8 +192,8 @@
         NewCommentHasErrors = string.IsNullOrWhiteSpace(NewCommentText);
         if (NewCommentHasErrors) return;
 
-        Bug.Comments.Add(new BugComment() { TimeStamp = DateTime.Now, Comment = NewCommentText });
-        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        Task.Comments.Add(new CommentDto() { TimeStamp = DateTime.Now, Comment = NewCommentText });
+        Task.Comments = Task.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
         NewCommentText = "";
     }
 }

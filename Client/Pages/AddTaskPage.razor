@@ -1,17 +1,19 @@
-﻿@page "/bugs/new"
+﻿@page "/tasks/new"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Client.Services
 @using Stroom.Shared
 @using Stroom.Shared.Models
 @using Stroom.Client.Components
-@using static Stroom.Shared.Enums.BugPropertiesEnums
+@using static Stroom.Shared.Enums.TaskPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
+@inject ITasksService TasksService
 
-<PageTitle>Add new bug</PageTitle>
+<PageTitle>Add new task</PageTitle>
 
 <div>
-    <BugForm @bind-Bug="Bug" />
+    <TaskForm @bind-Task="Task" />
     <MudStack Row="true" Class="mt-4">
         <MudButton Href="/" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
         <MudButton OnClick="Save" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
@@ -19,28 +21,19 @@
 </div>
 
 @code {
-    private Bug Bug { get; set; }
+    private TaskDto Task { get; set; }
 
     private bool OrderCommentsDescending = true;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
 
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        Bug = new Bug();
-        Bug.Comments = new List<BugComment>()
-        {
-            new BugComment(),
-            new BugComment(),
-            new BugComment(),
-            new BugComment(){ TimeStamp = new DateTime(2021, 05, 14, 19, 06, 12), Comment = "excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa" },
-            new BugComment(){ TimeStamp = new DateTime(2022, 07, 02, 08, 17, 12) }
-        }.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        Task = new TaskDto();
     }
 
     private void FlipSortDirection(){
         OrderCommentsDescending = !OrderCommentsDescending;
-        Bug.Comments = Bug.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
+        Task.Comments = Task.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
     }
 
     private void Save()

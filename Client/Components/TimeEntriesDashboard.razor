@@ -1,0 +1,75 @@
+﻿@using Stroom.Client.Services
+@using Stroom.Shared.Models
+
+<style>
+    .href-text {
+    font-weight: 500;
+    color: blue;
+}
+
+    .href-text:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<MudTable Items="@TimeEntries" Hover="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Worked Time</MudText>
+        <MudPagination Class="pa-4 mx-auto" Color="Color.Primary" Count="@pagesCount" @bind-Selected="@currentPage"/>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TimeEntry, object>(timeEntry => timeEntry.Task.Project.Name)">Project</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TimeEntry, object>(timeEntry => timeEntry.Task.TaskID)">TaskID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TimeEntry, object>(timeEntry => timeEntry.Task.Name)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TimeEntry, object>(timeEntry => timeEntry.Hours)">WorkedTime</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<TimeEntry, object>(timeEntry => timeEntry.Date)">Date</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Project">@context.Task.Project.Name</MudTd>
+        <MudTd DataLabel="TaskID"><a href="@($"tasks/{context.Task.TaskID}")" Class="href-text">@context.Task.TaskID</a></MudTd>
+        <MudTd DataLabel="Name"><a href="@($"tasks/{context.Task.TaskID}")" Class="href-text">@context.Task.Name</a></MudTd>
+        <MudTd DataLabel="Hours">@context.Hours h</MudTd>
+        <MudTd DataLabel="Date">@context.Date?.ToShortDateString()</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>
+    </PagerContent>
+</MudTable>
+
+@code {
+    private IEnumerable<TimeEntry> _TimeEntries = new List<TimeEntry>();
+    [Parameter]
+    public IEnumerable<TimeEntry> TimeEntries
+    {
+        get => _TimeEntries;
+        set
+        {
+            if (_TimeEntries == value) return;
+
+            _TimeEntries = value;
+            TimeEntriesChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<IEnumerable<TimeEntry>> TimeEntriesChanged { get; set; }
+
+    private string searchString = "";
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+
+    private int pagesCount => (int) (Math.Ceiling(((double)TimeEntries.Count() / (double)rowsPerPage)));
+
+
+    private bool FilterFunc(TimeEntry timeEntry)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (timeEntry.Task.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (timeEntry.Task.TaskID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

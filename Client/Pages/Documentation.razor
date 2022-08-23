@@ -13,13 +13,13 @@
 
 
 @code {
-    private Bug Issue { get; set; }
-    private ProjectDto SelectedProject { get; set; }
+    private TaskDto Task { get; set; }
+    private TaskDto SelectedProject { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
-        Issue = new Bug();
+        Task = new TaskDto();
     }
 
     private void Cancel(){

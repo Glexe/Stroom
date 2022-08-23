@@ -1,0 +1,81 @@
+﻿@using Stroom.Client.Services
+@using Stroom.Shared.Models
+
+<style>
+    .href-text {
+    font-weight: 500;
+    color: blue;
+}
+
+    .href-text:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<MudTable Items="@Tasks" Hover="true" Filter="new Func<TaskDto,bool>(FilterFunc)" CurrentPage="@(currentPage - 1)" @bind-RowsPerPage="@rowsPerPage">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Tasks</MudText>
+        <MudPagination Class="pa-4 mx-auto" Color="Color.Primary" Count="@pagesCount" @bind-Selected="@currentPage"/>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Project)">Project</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.TaskID)">TaskID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Name)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Priority)">Priority</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.Status)">Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.EstimatedTime)">EstimatedTime</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<TaskDto, object>(task => task.WorkedTime)">WorkedTime</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<TaskDto, object>(task => task.DueDate)">DueDate</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Project">@context.Project.Name</MudTd>
+        <MudTd DataLabel="TaskID"><a href="@($"tasks/{context.TaskID}")" Class="href-text">@context.TaskID</a></MudTd>
+        <MudTd DataLabel="Name"><a href="@($"tasks/{context.TaskID}")" Class="href-text">@context.Name</a></MudTd>
+        <MudTd DataLabel="Priority">@context.Priority</MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="EstimatedTime">@context.EstimatedTime h</MudTd>
+        <MudTd DataLabel="WorkedTime">@context.WorkedTime h</MudTd>
+        <MudTd DataLabel="DueDate">@context.DueDate?.ToShortDateString()</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>
+    </PagerContent>
+</MudTable>
+
+@code {
+    private IEnumerable<TaskDto> _Tasks = new List<TaskDto>();
+    [Parameter]
+    public IEnumerable<TaskDto> Tasks 
+    {
+        get => _Tasks;
+        set
+        {
+            if (_Tasks == value) return;
+
+            _Tasks = value;
+            TasksChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<IEnumerable<TaskDto>> TasksChanged { get; set; }
+
+    private string searchString = "";
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+
+    private int pagesCount => (int) (Math.Ceiling(((double)Tasks.Count() / (double)rowsPerPage)));
+
+
+    private bool FilterFunc(TaskDto task)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (task.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (task.TaskID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

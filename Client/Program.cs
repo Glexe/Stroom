@@ -24,7 +24,7 @@ namespace Stroom.Client
             builder.Services.AddMudServices();
 
             builder.Services.AddScoped<IProjectsService, TestProjectsService>();
-            builder.Services.AddScoped<IBugsService, TestBugsService>();
+            builder.Services.AddScoped<ITasksService, TestTasksService>();
 
             await builder.Build().RunAsync();
         }

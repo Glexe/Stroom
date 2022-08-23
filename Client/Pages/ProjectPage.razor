@@ -1,0 +1,42 @@
+﻿@page "/projects/{ProjectID:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Client.Services
+@using Stroom.Shared
+@using Stroom.Shared.Models
+@using Stroom.Client.Components
+@using static Stroom.Shared.Enums.TaskPropertiesEnums
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ITasksService TasksService
+
+@if(Project != null)
+{
+<PageTitle>@Project.Name</PageTitle>
+
+<TasksDashboard @bind-Tasks="TasksAssignedToUser" />
+    
+}
+
+@code {
+    [Parameter] public int ProjectID { get; set; }
+
+    private IEnumerable<TaskDto> TasksAssignedToUser = new List<TaskDto>();
+
+    private ProjectDto Project { get; set; }
+    private TimeEntry NewTimeEntry { get; set; } = new TimeEntry();
+
+    private bool IsEditFormOpen { get; set; } = false;
+    private bool IsHoursFormOpen { get; set; } = false;
+    private bool NewCommentHasErrors { get; set; } = false;
+    private bool OrderCommentsDescending { get; set; } = true;
+
+    private string NewCommentText;
+    private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TasksAssignedToUser = await TasksService.GetAsync();
+    }
+}

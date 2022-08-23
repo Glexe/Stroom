@@ -4,7 +4,7 @@
 @using Stroom.Shared
 @using Stroom.Shared.Models
 @using Stroom.Shared.Enums
-@using static Stroom.Shared.Enums.BugPropertiesEnums
+@using static Stroom.Shared.Enums.TaskPropertiesEnums
 @inject HttpClient Http
 @inject IProjectsService ProjectsService
 
@@ -18,9 +18,9 @@
 <MudStack>
     <MudStack>
     <MudPaper Class="pa-4">
-        <MudTextField Required="true" Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5" @bind-Value="Bug.Name" Immediate="true" Label="Name"/>
+        <MudTextField Required="true" Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5" @bind-Value="Task.Name" Immediate="true" Label="Name"/>
         <MudStack Row="true" Spacing="8">
-            <MudSelect Required="true" T="ProjectDto" @bind-Value="Bug.Project" Label="Project" AnchorOrigin="Origin.BottomCenter">
+            <MudSelect Required="true" T="TaskDto" @bind-Value="Task.Project" Label="Project" AnchorOrigin="Origin.BottomCenter">
             @{
                 if(Projects != null && Projects.Any())
                 { 
@@ -38,19 +38,19 @@
         <MudStack Row="true" Spacing="4">
             <MudItem Style="width: 50%; float: left;">
                 <MudStack Spacing="4">
-                    <MudSelect Required="true" T="BugStatus" @bind-Value="Bug.Status" Label="Status" AnchorOrigin="Origin.BottomCenter">
-                        @foreach (var bugStatus in BugPropertiesEnums.BugStatuses)
+                    <MudSelect Required="true" T="TaskPropertiesEnums.TaskStatus" @bind-Value="Task.Status" Label="Status" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var taskStatus in TaskPropertiesEnums.TaskStatuses)
                         {
-                            <MudSelectItem Value="@bugStatus" />
+                            <MudSelectItem Value="@taskStatus" />
                         }
                     </MudSelect>
-                    <MudSelect Required="true" T="BugPriority" @bind-Value="Bug.Priority" Label="Priority" AnchorOrigin="Origin.BottomCenter">
-                        @foreach (var bugPriority in BugPropertiesEnums.BugPriorities)
+                    <MudSelect Required="true" T="TaskPriority" @bind-Value="Task.Priority" Label="Priority" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var taskPriority in TaskPropertiesEnums.TaskPriorities)
                         {
-                            <MudSelectItem Value="@bugPriority" />
+                            <MudSelectItem Value="@taskPriority" />
                         }
                     </MudSelect>
-                    <MudSelect Required="true" T="string" @bind-Value="Bug.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelect Required="true" T="string" @bind-Value="Task.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
                         <MudSelectItem Value="@("<Me>")" />
                         <MudSelectItem Value="@("John H.")" />
                         <MudSelectItem Value="@("Mia R.")" />
@@ -59,12 +59,12 @@
             </MudItem>
             <MudItem Style="width: 50%; float: right;">
                 <MudStack Spacing="4">
-                    <MudDatePicker Required="true" @bind-Date="Bug.SubmitionDate" Label="Submition Date" DisableToolbar="true" />
-                    <MudDatePicker Required="true" @bind-Date="Bug.DueDate" Label="Due Date" DisableToolbar="true" />
+                    <MudDatePicker Required="true" @bind-Date="Task.SubmitionDate" Label="Submition Date" DisableToolbar="true" />
+                    <MudDatePicker Required="true" @bind-Date="Task.DueDate" Label="Due Date" DisableToolbar="true" />
                     <span style="width: 100% !important;">
                         <MudTooltip Color="Color.Transparent" Placement="Placement.Bottom">
                             <ChildContent>
-                                <MudNumericField Required="true" @bind-Value="Bug.EstimatedTime" Label="Estimated Time" Variant="Variant.Text" Min="1" Max="99999" />
+                                <MudNumericField Required="true" @bind-Value="Task.EstimatedTime" Label="Estimated Time" Variant="Variant.Text" Min="1" Max="99999" />
                             </ChildContent>
                             <TooltipContent>
                                 <MudAlert Severity="Severity.Info" Dense="true">Tip: Use shift + mouse wheel to adjust the number</MudAlert>
@@ -77,28 +77,28 @@
 
         <MudDivider Class="my-3" />
         <MudStack>
-            <MudTextField Class="d-inline" @bind-Value="Bug.Description" Immediate="true" Label="Description" Lines="4" />
+            <MudTextField Class="d-inline" @bind-Value="Task.Description" Immediate="true" Label="Description" Lines="4" />
         </MudStack>
     </MudPaper>
     </MudStack>
 </MudStack>
 
 @code {
-    private Bug _Bug = new Bug();
+    private TaskDto _Task = new TaskDto();
     [Parameter]
-    public Bug Bug 
+    public TaskDto Task 
     {
-        get => _Bug;
+        get => _Task;
         set
         {
-            if (_Bug == value) return;
+            if (_Task == value) return;
 
-            _Bug = value;
-            BugChanged.InvokeAsync(value);
+            _Task = value;
+            TaskChanged.InvokeAsync(value);
         }
     }
     [Parameter]
-    public EventCallback<Bug> BugChanged { get; set; }
+    public EventCallback<TaskDto> TaskChanged { get; set; }
 
     private ProjectDto[]? Projects { get; set; }
 

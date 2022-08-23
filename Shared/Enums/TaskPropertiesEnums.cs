@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Stroom.Shared.Enums
 {
-    public class BugPropertiesEnums
+    public class TaskPropertiesEnums
     {
-        public static IEnumerable<BugPriority> BugPriorities { get; set; } = Enum.GetValues(typeof(BugPriority)).OfType<BugPriority>();
-        public static IEnumerable<BugStatus> BugStatuses { get; set; } = Enum.GetValues(typeof(BugStatus)).OfType<BugStatus>();
-        public enum BugPriority
+        public static IEnumerable<TaskPriority> TaskPriorities { get; set; } = Enum.GetValues(typeof(TaskPriority)).OfType<TaskPriority>();
+        public static IEnumerable<TaskStatus> TaskStatuses { get; set; } = Enum.GetValues(typeof(TaskStatus)).OfType<TaskStatus>();
+        public enum TaskPriority
         {
             Low = 0,
             Normal = 1,
@@ -19,7 +19,7 @@ namespace Stroom.Shared.Enums
             Blocking = 4
         }
 
-        public enum BugStatus
+        public enum TaskStatus
         {
             New = 0,
             Ongoing = 1,

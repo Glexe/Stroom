@@ -10,5 +10,6 @@ namespace Stroom.Shared.Models
     {
         public string Name { get; set; } = "Hlib";
         public string Surname { get; set; } = "Pivniev";
+        public virtual IEnumerable<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
     }
 }

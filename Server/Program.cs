@@ -32,7 +32,7 @@ namespace Stroom
             builder.Services.AddLogging();
 
             builder.Services.AddScoped<IProjectsRepository, TestProjectsRepository>();
-            builder.Services.AddScoped<IBugsRepository, TestBugsRepository>();
+            builder.Services.AddScoped<ITasksRepository, TestTasksRepository>();
 
 
             var app = builder.Build();
