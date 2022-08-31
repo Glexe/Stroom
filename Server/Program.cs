@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Stroom.Server.Contexts;
 using Stroom.Server.Data;
 using Stroom.Server.Models;
 using Stroom.Server.Repositories;
@@ -14,15 +15,17 @@ namespace Stroom
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(connectionString));
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<AppDbContext>();
 
             builder.Services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                .AddApiAuthorization<ApplicationUser, AppDbContext>();
 
             builder.Services.AddAuthentication()
                 .AddIdentityServerJwt();
@@ -31,8 +34,9 @@ namespace Stroom
             builder.Services.AddRazorPages();
             builder.Services.AddLogging();
 
-            builder.Services.AddScoped<IProjectsRepository, TestProjectsRepository>();
-            builder.Services.AddScoped<ITasksRepository, TestTasksRepository>();
+            builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
+            builder.Services.AddScoped<ITasksRepository, TasksRepository>();
+
 
 
             var app = builder.Build();

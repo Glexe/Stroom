@@ -1,19 +1,21 @@
-﻿using Stroom.Shared.Models;
+﻿using Stroom.Server.Contexts;
+using Stroom.Shared.Models;
 
 namespace Stroom.Server.Repositories
 {
-    public class TestProjectsRepository : IProjectsRepository
+    public class ProjectsRepository : IProjectsRepository
     {
-        private readonly List<ProjectDto> TestProjects = new()
+        private readonly ApplicationDbContext ApplicationDbContext;
+
+        public ProjectsRepository(ApplicationDbContext taskContext)
         {
-            new ProjectDto(){ ProjectID = 1, Name = "Moon colony" },
-            new ProjectDto(){ ProjectID = 2, Name = "Venus expedition" },
-            new ProjectDto(){ ProjectID = 3, Name = "Mars terraforming" }
-        };
+            ApplicationDbContext = taskContext;
+        }
 
         public ProjectDto Add(ProjectDto projectDto)
         {
-            throw new NotImplementedException();
+            ApplicationDbContext.Add(projectDto);
+            return projectDto;
         }
 
         public ProjectDto Delete(int projectId)
@@ -30,12 +32,12 @@ namespace Stroom.Server.Repositories
 
         public ProjectDto Get(int projectId)
         {
-            return TestProjects.FirstOrDefault(project => project.ProjectID == projectId);
+            return ApplicationDbContext.Projects.Find(projectId);
         }
 
         public IEnumerable<ProjectDto> Get()
         {
-            return TestProjects;
+            return ApplicationDbContext.Projects.ToList();
         }
 
         public ProjectDto Modify(int projectId, ProjectDto projectDto)

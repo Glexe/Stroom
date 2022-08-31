@@ -54,7 +54,7 @@
     </div>
     @foreach(var statusName in TaskPropertiesEnums.TaskStatuses)
     {
-        var tasksFiltered = AllTasks.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUserName))).ToList();
+        var tasksFiltered = AllTasks.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUser))).ToList();
         var tasksCount = tasksFiltered.Count;
         if (tasksCount < 1) continue;
         ProjectHasAnyTasksAssigned = true;
@@ -121,7 +121,7 @@
     private bool ShowAllProject = true;
 
     private string SelectedProjectName = "All projects";
-    private string CurrentUserName = "Emma Wills"; //todo: parse somehow current user name
+    private User CurrentUser = new User() { Name = "Emma Wills" };
     private string SearchString = "";
 
     private int PagesCount => (int) (Math.Ceiling(((double)AllTasks.Count() / (double)RowsPerPage)));

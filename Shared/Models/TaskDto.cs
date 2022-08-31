@@ -12,8 +12,7 @@ namespace Stroom.Shared.Models
         public int TaskID { get; set; } = 1404;
         public string Name { get; set; } = "Laborum adipisicing culpa";
         public string Description { get; set; } = "Elit nisi ad excepteur aliquip cupidatat aliquip occaecat consectetur ex. Non culpa laborum pariatur mollit anim et nisi quis sint enim consequat fugiat consequat labore. Occaecat Lorem dolore irure esse et est adipisicing deserunt.";
-        public string Owner { get; set; } = "James Green";
-        public string Assignee { get; set; } = "Emma Wills";
+        public User Assignee { get; set; } = new User();
         public TaskPriority Priority { get; set; } = TaskPriority.Low;
         public Enums.TaskPropertiesEnums.TaskStatus Status { get; set; } = Enums.TaskPropertiesEnums.TaskStatus.New;
         public float EstimatedTime { get; set; } = 1;

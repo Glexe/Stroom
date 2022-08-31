@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 using MudBlazor.Services;
 using Stroom.Client.Services;
 
@@ -25,6 +26,7 @@ namespace Stroom.Client
 
             builder.Services.AddScoped<IProjectsService, TestProjectsService>();
             builder.Services.AddScoped<ITasksService, TestTasksService>();
+            builder.Services.AddScoped<IClipboardService, ClipboardService>();
 
             await builder.Build().RunAsync();
         }

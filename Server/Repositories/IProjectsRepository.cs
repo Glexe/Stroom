@@ -9,6 +9,7 @@ namespace Stroom.Server.Repositories
         public ProjectDto Delete (int projectId);
         public ProjectDto Add(ProjectDto projectDto);
         public ProjectDto Modify(int projectId, ProjectDto projectDto);
+        public string GenerateInvitationToken(int projectId);
         public bool SaveChanges();
     }
 }

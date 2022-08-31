@@ -12,6 +12,16 @@ namespace Stroom.Client.Services
             Client = client;
         }
 
+        public Task<ProjectDto> AddUserToProject(int projectId, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> GenerateInvitationLink(int projectId)
+        {
+            return await Client.GetStringAsync($"api/Projects/generate-invitation-token/{projectId}");
+        }
+
         public async Task<ProjectDto[]> GetAsync()
         {
             return await Client.GetFromJsonAsync<ProjectDto[]>("api/Projects");

@@ -11,6 +11,17 @@
 @inject NavigationManager NavigationManager
 @inject ITasksService TasksService
 
+<style>
+    .href-text {
+        font-weight: 500;
+        color: blue;
+    }
+
+    .href-text:hover {
+        text-decoration: underline;
+    }
+</style>
+
 @if(Task != null)
 {
 <PageTitle>@Task.Name</PageTitle>
@@ -43,7 +54,7 @@
 
 <MudStack Style="@((IsEditFormOpen || IsHoursFormOpen) ? "visibility: hidden;" : "")">
     <MudPaper Class="pa-4">
-        <MudText Typo="Typo.subtitle2">@Task.Project.Name / Task ID - @Task.TaskID</MudText>
+        <MudText Typo="Typo.subtitle2"><a class=".href-text" href=@($"projects/{Task.Project.ProjectID}")>@Task.Project.Name</a> / Task ID - @Task.TaskID</MudText>
         <span>
             <MudText Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5">@Task.Name</MudText>
             <div style="float: right;">
@@ -62,10 +73,6 @@
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Priority:</MudText>
                         <MudText Typo="Typo.body2" >@Task.Priority</MudText>
-                    </MudStack>
-                    <MudStack Row="true" Spacing="8">
-                        <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Owner:</MudText>
-                        <MudText Typo="Typo.body2">@Task.Owner</MudText>
                     </MudStack>
                     <MudStack Row="true" Spacing="8">
                         <MudText Typo="Typo.body2" Style="@($"color:{Colors.Grey.Lighten1}; min-width: 105px;")">Assignee:</MudText>

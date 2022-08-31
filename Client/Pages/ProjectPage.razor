@@ -27,6 +27,8 @@
 @if(Project != null)
 {
     <PageTitle>@Project.Name</PageTitle>
+
+    <MudText Typo="Typo.h4">@Project.Name</MudText>
     
     <MudStack Row="true" Spacing="4">
         <MudItem Style="width: 50%; float: left;">
@@ -79,14 +81,19 @@
                     <MudTd DataLabel="Surname">@context.Surname</MudTd>
                     <MudTd DataLabel="Email">@context.Email</MudTd>
                     <MudTd DataLabel="Role">@context.Role</MudTd>
-                    <MudTd DataLabel="Actions"><MudButton OnClick="@(async () => await RemoveUser(@context))" Variant="Variant.Filled" Color="Color.Error">Remove</MudButton></MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudStack Row="true" Spacing="4">
+                            <MudButton OnClick="@(async () => await RemoveUser(@context))" Variant="Variant.Filled" Color="Color.Error">Remove</MudButton>
+                            <MudButton OnClick="@(async () => await EditUser(@context))" Variant="Variant.Filled" Color="Color.Warning">Edit</MudButton>
+                        </MudStack>
+                    </MudTd>
                 </RowTemplate>
                 <PagerContent>
                     <MudTablePager HorizontalAlignment="HorizontalAlignment.Right" HidePageNumber="true" HidePagination="true"/>
                 </PagerContent>
             </MudTable>
             <MudStack Row="true" Class="mt-4">
-                <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Add</MudButton>
+                <MudButton OnClick="ShowInvitationLink" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Add</MudButton>
             </MudStack>
         </MudItem>
     </MudStack>
@@ -124,7 +131,6 @@
         {
             new User()
         };
-        Console.WriteLine(1);
     }
 
     private async Task RemoveUser(User user)
@@ -139,5 +145,29 @@
         {
             Users.Remove(user);
         }
+    }
+
+    private async Task EditUser(User user)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("User", user);
+
+        var res = await DialogService.Show<EditProjectUserDialog>("Edit", parameters, options).Result;
+        //if (!res.Cancelled)
+        //{
+        //    User modifiedUser = res.Data as User;
+        //}
+    }
+
+    private async void ShowInvitationLink()
+    {
+        var invitationLink = await ProjectsService.GenerateInvitationLink(ProjectID);
+        var test = await ProjectsService.GetAsync(ProjectID);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("InvitationLink", invitationLink);
+
+        DialogService.Show<ShowProjectInvitationLinkDialog>("Invitation", parameters, options);
     }
 }

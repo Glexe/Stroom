@@ -50,10 +50,10 @@
                             <MudSelectItem Value="@taskPriority" />
                         }
                     </MudSelect>
-                    <MudSelect Required="true" T="string" @bind-Value="Task.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@("<Me>")" />
-                        <MudSelectItem Value="@("John H.")" />
-                        <MudSelectItem Value="@("Mia R.")" />
+                    <MudSelect Required="true" T="User" @bind-Value="Task.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@(new User(){Name = "Hlib P."})" />Assignee
+                        <MudSelectItem Value="@(new User(){Name = "John H."})" />
+                        <MudSelectItem Value="@(new User(){Name = "Mia R."})" />
                     </MudSelect>
                 </MudStack>
             </MudItem>

@@ -1,0 +1,40 @@
+﻿@using Stroom.Shared.Enums
+@using Stroom.Shared.Models
+@using static Stroom.Shared.Enums.UserPropertiesEnums
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect Required="true" @bind-Value="UserRole" Label="Select role">
+            @foreach (var role in UserPropertiesEnums.UserRoles)
+            {
+                <MudSelectItem Value="@role">@role</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public User User { get; set; }
+    private UserPropertiesEnums.UserRole UserRole { get; set; }
+
+    protected override void OnInitialized()
+    {
+        UserRole = User.Role;
+    }
+
+    private void Save()
+    {
+
+        //SaveChanges();
+        User.Role = UserRole;
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    private void Cancel() => MudDialog.Cancel();
+}
+
