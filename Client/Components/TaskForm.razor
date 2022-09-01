@@ -7,6 +7,7 @@
 @using static Stroom.Shared.Enums.TaskPropertiesEnums
 @inject HttpClient Http
 @inject IProjectsService ProjectsService
+@inject IUsersService UsersService
 
 <style>
     /*overriding framework class*/
@@ -51,9 +52,12 @@
                         }
                     </MudSelect>
                     <MudSelect Required="true" T="User" @bind-Value="Task.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@(new User(){Name = "Hlib P."})" />Assignee
-                        <MudSelectItem Value="@(new User(){Name = "John H."})" />
-                        <MudSelectItem Value="@(new User(){Name = "Mia R."})" />
+                        @{
+                            foreach (var user in Users)
+                                {
+                                    <MudSelectItem Value="@user" />
+                                }
+                        }
                     </MudSelect>
                 </MudStack>
             </MudItem>
@@ -101,12 +105,14 @@
     public EventCallback<TaskDto> TaskChanged { get; set; }
 
     private ProjectDto[]? Projects { get; set; }
+    private User[]? Users { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Projects = await ProjectsService.GetAsync();
+            Users = await UsersService.GetAsync();
         }
         catch (AccessTokenNotAvailableException exception)
         {

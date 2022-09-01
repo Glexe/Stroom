@@ -18,7 +18,7 @@ namespace Stroom.Server.EfConfigurations
 
             builder.HasMany(e => e.Tasks).WithOne(task => task.Assignee);
 
-            builder.HasMany(e => e.Projects).WithMany(project => project.AssignedUsers);
+            builder.HasMany(e => e.Projects);
         }
     }
 }

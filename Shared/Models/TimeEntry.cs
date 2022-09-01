@@ -10,9 +10,9 @@ namespace Stroom.Shared.Models
     {
         public DateTime? Date { get; set; }
         public float Hours { get; set; }
-        public TaskDto Task { get; set; }
+        public virtual TaskDto Task { get; set; }
         public int? TaskID { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public int? UserID { get; set; }
     }
 }

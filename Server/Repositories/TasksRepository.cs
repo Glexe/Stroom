@@ -6,16 +6,19 @@ namespace Stroom.Server.Repositories
 {
     public class TasksRepository : ITasksRepository
     {
-        private readonly ApplicationDbContext TaskContext;
+        private readonly ApplicationDbContext ApplicationContext;
 
-        public TasksRepository(ApplicationDbContext taskContext)
+        public TasksRepository(ApplicationDbContext applicationContext)
         {
-            TaskContext = taskContext;
+            ApplicationContext = applicationContext;
         }
         
         public TaskDto Add(TaskDto task)
         {
-            throw new NotImplementedException();
+            ApplicationContext.Entry(task.Project).State = EntityState.Unchanged;
+            ApplicationContext.Entry(task.Assignee).State = EntityState.Unchanged;
+            ApplicationContext.Add(task);
+            return task;
         }
 
         public TaskDto Delete(int taskId)
@@ -25,12 +28,12 @@ namespace Stroom.Server.Repositories
 
         public IEnumerable<TaskDto> Get()
         {
-            return TaskContext.Tasks.Include(e => e.Project).ToList();
+            return ApplicationContext.Tasks.Include(e => e.Project).ToList();            
         }
 
         public TaskDto Get(int taskId)
         {
-            return TaskContext.Tasks.Find(taskId);
+            return ApplicationContext.Tasks.Include(e => e.Project).First(e => e.TaskID == taskId);
         }
 
         public TaskDto Modify(int taskId, TaskDto task)
@@ -40,7 +43,7 @@ namespace Stroom.Server.Repositories
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return ApplicationContext.SaveChanges() == 1;
         }
     }
 }

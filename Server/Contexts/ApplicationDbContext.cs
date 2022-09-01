@@ -12,6 +12,8 @@ namespace Stroom.Server.Contexts
     {
         public virtual DbSet<TaskDto> Tasks { get; set; }
         public virtual DbSet<ProjectDto> Projects { get; set; }
+        public virtual DbSet<TimeEntry> TimeEntries { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         private readonly IConfiguration _configuration;
 
@@ -55,9 +57,9 @@ namespace Stroom.Server.Contexts
                 AssigneeID = 1,
                 Priority = Shared.Enums.TaskPropertiesEnums.TaskPriority.Low,
                 Status = Shared.Enums.TaskPropertiesEnums.TaskStatus.New,
-                EstimatedTime = null,
+                EstimatedTime = 13,
                 SubmitionDate = DateTime.Now,
-                DueDate = null,
+                DueDate = DateTime.Now.AddDays(7),
                 ProjectID = 1
             };
             var timeEntry = new TimeEntry()

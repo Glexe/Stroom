@@ -12,8 +12,8 @@ using Stroom.Server.Contexts;
 namespace Stroom.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220901173946_AddedDataSeeding")]
-    partial class AddedDataSeeding
+    [Migration("20220901235746_hotfix3")]
+    partial class hotfix3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,21 +23,6 @@ namespace Stroom.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.Property<int>("AssignedUsersUserID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectsProjectID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AssignedUsersUserID", "ProjectsProjectID");
-
-                    b.HasIndex("ProjectsProjectID");
-
-                    b.ToTable("ProjectDtoUser");
-                });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
                 {
@@ -68,7 +53,7 @@ namespace Stroom.Server.Migrations
                             TaskID = 1,
                             UserID = 1,
                             Comment = "Task is complicated...",
-                            TimeStamp = new DateTime(2022, 9, 2, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9437)
+                            TimeStamp = new DateTime(2022, 9, 3, 1, 57, 46, 557, DateTimeKind.Local).AddTicks(8034)
                         });
                 });
 
@@ -90,8 +75,13 @@ namespace Stroom.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ProjectID")
                         .HasName("Project_PK");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Project", (string)null);
 
@@ -158,11 +148,13 @@ namespace Stroom.Server.Migrations
                             TaskID = 1,
                             AssigneeID = 1,
                             Description = "Name speaks itself",
+                            DueDate = new DateTime(2022, 9, 9, 1, 57, 46, 557, DateTimeKind.Local).AddTicks(8026),
+                            EstimatedTime = 13f,
                             Name = "Change start button color",
                             Priority = 0,
                             ProjectID = 1,
                             Status = 0,
-                            SubmitionDate = new DateTime(2022, 9, 1, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9382)
+                            SubmitionDate = new DateTime(2022, 9, 2, 1, 57, 46, 557, DateTimeKind.Local).AddTicks(7986)
                         });
                 });
 
@@ -193,7 +185,7 @@ namespace Stroom.Server.Migrations
                         {
                             TaskID = 1,
                             UserID = 1,
-                            Date = new DateTime(2022, 8, 30, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9432),
+                            Date = new DateTime(2022, 8, 31, 1, 57, 46, 557, DateTimeKind.Local).AddTicks(8030),
                             Hours = 3f
                         });
                 });
@@ -223,7 +215,7 @@ namespace Stroom.Server.Migrations
 
                     b.HasKey("UserID");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -234,21 +226,6 @@ namespace Stroom.Server.Migrations
                             Role = 0,
                             Surname = "Pivniev"
                         });
-                });
-
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.HasOne("Stroom.Shared.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("AssignedUsersUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Stroom.Shared.Models.ProjectDto", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
@@ -270,6 +247,13 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
+                {
+                    b.HasOne("Stroom.Shared.Models.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserID");
+                });
+
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.HasOne("Stroom.Shared.Models.User", "Assignee")
@@ -279,7 +263,7 @@ namespace Stroom.Server.Migrations
                         .IsRequired();
 
                     b.HasOne("Stroom.Shared.Models.ProjectDto", "Project")
-                        .WithMany("Tasks")
+                        .WithMany()
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -308,11 +292,6 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.Navigation("Comments");
@@ -323,6 +302,8 @@ namespace Stroom.Server.Migrations
             modelBuilder.Entity("Stroom.Shared.Models.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Projects");
 
                     b.Navigation("Tasks");
 

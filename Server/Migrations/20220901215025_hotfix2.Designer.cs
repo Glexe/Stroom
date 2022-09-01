@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stroom.Server.Contexts;
 
@@ -11,9 +12,10 @@ using Stroom.Server.Contexts;
 namespace Stroom.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class TaskContextModelSnapshot : ModelSnapshot
+    [Migration("20220901215025_hotfix2")]
+    partial class hotfix2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +23,6 @@ namespace Stroom.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.Property<int>("AssignedUsersUserID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectsProjectID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AssignedUsersUserID", "ProjectsProjectID");
-
-                    b.HasIndex("ProjectsProjectID");
-
-                    b.ToTable("ProjectDtoUser");
-                });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
                 {
@@ -66,7 +53,7 @@ namespace Stroom.Server.Migrations
                             TaskID = 1,
                             UserID = 1,
                             Comment = "Task is complicated...",
-                            TimeStamp = new DateTime(2022, 9, 2, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9437)
+                            TimeStamp = new DateTime(2022, 9, 2, 23, 50, 25, 392, DateTimeKind.Local).AddTicks(1066)
                         });
                 });
 
@@ -88,8 +75,13 @@ namespace Stroom.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ProjectID")
                         .HasName("Project_PK");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Project", (string)null);
 
@@ -160,7 +152,7 @@ namespace Stroom.Server.Migrations
                             Priority = 0,
                             ProjectID = 1,
                             Status = 0,
-                            SubmitionDate = new DateTime(2022, 9, 1, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9382)
+                            SubmitionDate = new DateTime(2022, 9, 1, 23, 50, 25, 392, DateTimeKind.Local).AddTicks(1025)
                         });
                 });
 
@@ -191,7 +183,7 @@ namespace Stroom.Server.Migrations
                         {
                             TaskID = 1,
                             UserID = 1,
-                            Date = new DateTime(2022, 8, 30, 19, 39, 46, 572, DateTimeKind.Local).AddTicks(9432),
+                            Date = new DateTime(2022, 8, 30, 23, 50, 25, 392, DateTimeKind.Local).AddTicks(1059),
                             Hours = 3f
                         });
                 });
@@ -221,7 +213,7 @@ namespace Stroom.Server.Migrations
 
                     b.HasKey("UserID");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -232,21 +224,6 @@ namespace Stroom.Server.Migrations
                             Role = 0,
                             Surname = "Pivniev"
                         });
-                });
-
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.HasOne("Stroom.Shared.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("AssignedUsersUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Stroom.Shared.Models.ProjectDto", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
@@ -268,6 +245,13 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
+                {
+                    b.HasOne("Stroom.Shared.Models.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserID");
+                });
+
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.HasOne("Stroom.Shared.Models.User", "Assignee")
@@ -277,7 +261,7 @@ namespace Stroom.Server.Migrations
                         .IsRequired();
 
                     b.HasOne("Stroom.Shared.Models.ProjectDto", "Project")
-                        .WithMany("Tasks")
+                        .WithMany()
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -306,11 +290,6 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.Navigation("Comments");
@@ -321,6 +300,8 @@ namespace Stroom.Server.Migrations
             modelBuilder.Entity("Stroom.Shared.Models.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Projects");
 
                     b.Navigation("Tasks");
 

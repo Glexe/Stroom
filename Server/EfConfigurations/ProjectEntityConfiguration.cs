@@ -13,8 +13,8 @@ namespace Stroom.Server.EfConfigurations
             builder.Property(e => e.Name).IsRequired().HasMaxLength(256);
             builder.Property(e => e.Description).HasMaxLength(2048);
 
-            builder.HasMany(e => e.AssignedUsers).WithMany(user => user.Projects);
-            builder.HasMany(e => e.Tasks).WithOne(task => task.Project);
+            //builder.HasMany(e => e.AssignedUsers).WithMany(user => user.Projects);
+            //builder.HasMany(e => e.Tasks).WithOne(task => task.Project);
         }
     }
 }

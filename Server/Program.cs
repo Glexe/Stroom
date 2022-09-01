@@ -36,6 +36,8 @@ namespace Stroom
 
             builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
             builder.Services.AddScoped<ITasksRepository, TasksRepository>();
+            builder.Services.AddScoped<ITimeEntriesRepository, TimeEntriesRepository>();
+            builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 
 

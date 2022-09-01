@@ -1,5 +1,6 @@
 ﻿@using Stroom.Client.Services
 @using Stroom.Shared.Models
+@inject ITasksService TasksService
 
 <style>
     .href-text {
@@ -60,7 +61,6 @@
     private int rowsPerPage = 10;
 
     private int pagesCount => (int) (Math.Ceiling(((double)TimeEntries.Count() / (double)rowsPerPage)));
-
 
     private bool FilterFunc(TimeEntry timeEntry)
     {

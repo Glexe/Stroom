@@ -19,8 +19,10 @@
             <MudNavLink Href="@($"projects/{project.ProjectID}")">@project.Name</MudNavLink>
         }
     </MudNavGroup>
-    <MudNavLink Href="/documentation" Icon="@Icons.Custom.FileFormats.FileDocument">Documentation</MudNavLink>
-    <MudNavLink Href="/settings" Icon="@Icons.Filled.Settings">Settings</MudNavLink>
+    @{
+        //<MudNavLink Href="/documentation" Icon="@Icons.Custom.FileFormats.FileDocument">Documentation</MudNavLink>
+        //<MudNavLink Href="/settings" Icon="@Icons.Filled.Settings">Settings</MudNavLink>
+    }
 </MudNavMenu>
 
 

@@ -20,7 +20,7 @@ namespace Stroom.Server.EfConfigurations
 
 
             builder.HasOne(e => e.Assignee).WithMany(user => user.Tasks).HasForeignKey(e => e.AssigneeID);
-            builder.HasOne(e => e.Project).WithMany(project => project.Tasks).HasForeignKey(e => e.ProjectID);
+            builder.HasOne(e => e.Project);
         }
     }
 }

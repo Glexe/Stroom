@@ -10,9 +10,9 @@ namespace Stroom.Shared.Models
     {
         public string Comment { get; set; }
         public DateTime TimeStamp { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public int? UserID { get; set; }
-        public TaskDto Task { get; set; }
+        public virtual TaskDto Task { get; set; }
         public int? TaskID { get; set; }
     }
 }

@@ -26,6 +26,8 @@ namespace Stroom.Client
 
             builder.Services.AddScoped<IProjectsService, TestProjectsService>();
             builder.Services.AddScoped<ITasksService, TestTasksService>();
+            builder.Services.AddScoped<ITimeEntriesService, TimeEntriesService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IClipboardService, ClipboardService>();
 
             await builder.Build().RunAsync();

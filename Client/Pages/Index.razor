@@ -3,6 +3,7 @@
 @using Stroom.Shared.Models
 @using Stroom.Client.Components
 @inject ITasksService TasksService
+@inject ITimeEntriesService TimeEntriesService
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 
 <style>
@@ -23,17 +24,18 @@
 
 <MudDivider Class="my-8" />
 
-<TimeEntriesDashboard @bind-TimeEntries="CurrentUser.TimeEntries"/>
+<TimeEntriesDashboard @bind-TimeEntries="TimneEntries"/>
 
 
 @code {
     private IEnumerable<TaskDto> TasksAssignedToUser = new List<TaskDto>();
+    private IEnumerable<TimeEntry> TimneEntries = new List<TimeEntry>();
     private User CurrentUser = new User();
 
     protected override async Task OnInitializedAsync()
     {
         TasksAssignedToUser = await TasksService.GetAsync();
-        CurrentUser.TimeEntries = new List<TimeEntry>() { new TimeEntry() { Hours = 3 }, new TimeEntry() { Hours = 4, Date = DateTime.Now.AddDays(3) }, new TimeEntry() { Hours = 6, Date = DateTime.Now.AddDays(-1) }, new TimeEntry() { Hours = 1, Date = DateTime.Now.AddDays(2) } };
+        TimneEntries = await TimeEntriesService.GetAsync();
     }
 
     private void test()

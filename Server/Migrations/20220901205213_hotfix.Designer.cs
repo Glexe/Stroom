@@ -12,8 +12,8 @@ using Stroom.Server.Contexts;
 namespace Stroom.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220831140514_Init")]
-    partial class Init
+    [Migration("20220901205213_hotfix")]
+    partial class hotfix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,21 +23,6 @@ namespace Stroom.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.Property<int>("AssignedUsersUserID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectsProjectID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AssignedUsersUserID", "ProjectsProjectID");
-
-                    b.HasIndex("ProjectsProjectID");
-
-                    b.ToTable("ProjectDtoUser");
-                });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
                 {
@@ -52,9 +37,6 @@ namespace Stroom.Server.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<int>("CommentID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime");
 
@@ -64,6 +46,15 @@ namespace Stroom.Server.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Comment", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TaskID = 1,
+                            UserID = 1,
+                            Comment = "Task is complicated...",
+                            TimeStamp = new DateTime(2022, 9, 2, 22, 52, 12, 826, DateTimeKind.Local).AddTicks(4426)
+                        });
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
@@ -84,10 +75,23 @@ namespace Stroom.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ProjectID")
                         .HasName("Project_PK");
 
+                    b.HasIndex("UserID");
+
                     b.ToTable("Project", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ProjectID = 1,
+                            Description = "Moon landing program",
+                            Name = "Moon colony"
+                        });
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
@@ -98,7 +102,7 @@ namespace Stroom.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskID"), 1L, 1);
 
-                    b.Property<int>("AssigneeUserID")
+                    b.Property<int>("AssigneeID")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -109,7 +113,7 @@ namespace Stroom.Server.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime");
 
-                    b.Property<float>("EstimatedTime")
+                    b.Property<float?>("EstimatedTime")
                         .HasColumnType("real");
 
                     b.Property<string>("Name")
@@ -132,20 +136,33 @@ namespace Stroom.Server.Migrations
                     b.HasKey("TaskID")
                         .HasName("Task_PK");
 
-                    b.HasIndex("AssigneeUserID");
+                    b.HasIndex("AssigneeID");
 
                     b.HasIndex("ProjectID");
 
                     b.ToTable("Task", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TaskID = 1,
+                            AssigneeID = 1,
+                            Description = "Name speaks itself",
+                            Name = "Change start button color",
+                            Priority = 0,
+                            ProjectID = 1,
+                            Status = 0,
+                            SubmitionDate = new DateTime(2022, 9, 1, 22, 52, 12, 826, DateTimeKind.Local).AddTicks(4386)
+                        });
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.TimeEntry", b =>
                 {
-                    b.Property<int>("TimeEntryID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int?>("TaskID")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TimeEntryID"), 1L, 1);
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("Date")
                         .IsRequired()
@@ -154,22 +171,21 @@ namespace Stroom.Server.Migrations
                     b.Property<float>("Hours")
                         .HasColumnType("real");
 
-                    b.Property<int?>("TaskID")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserID")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.HasKey("TimeEntryID")
+                    b.HasKey("TaskID", "UserID")
                         .HasName("TimeEntry_PK");
-
-                    b.HasIndex("TaskID");
 
                     b.HasIndex("UserID");
 
                     b.ToTable("TimeEntry", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TaskID = 1,
+                            UserID = 1,
+                            Date = new DateTime(2022, 8, 30, 22, 52, 12, 826, DateTimeKind.Local).AddTicks(4422),
+                            Hours = 3f
+                        });
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.User", b =>
@@ -198,21 +214,16 @@ namespace Stroom.Server.Migrations
                     b.HasKey("UserID");
 
                     b.ToTable("User");
-                });
 
-            modelBuilder.Entity("ProjectDtoUser", b =>
-                {
-                    b.HasOne("Stroom.Shared.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("AssignedUsersUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Stroom.Shared.Models.ProjectDto", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasData(
+                        new
+                        {
+                            UserID = 1,
+                            Email = "gl.pvn12@gmail.com",
+                            Name = "Hlib",
+                            Role = 0,
+                            Surname = "Pivniev"
+                        });
                 });
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
@@ -234,16 +245,23 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
+                {
+                    b.HasOne("Stroom.Shared.Models.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserID");
+                });
+
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.HasOne("Stroom.Shared.Models.User", "Assignee")
                         .WithMany("Tasks")
-                        .HasForeignKey("AssigneeUserID")
+                        .HasForeignKey("AssigneeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Stroom.Shared.Models.ProjectDto", "Project")
-                        .WithMany("Tasks")
+                        .WithMany()
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -272,11 +290,6 @@ namespace Stroom.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Stroom.Shared.Models.ProjectDto", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
             modelBuilder.Entity("Stroom.Shared.Models.TaskDto", b =>
                 {
                     b.Navigation("Comments");
@@ -287,6 +300,8 @@ namespace Stroom.Server.Migrations
             modelBuilder.Entity("Stroom.Shared.Models.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Projects");
 
                     b.Navigation("Tasks");
 
