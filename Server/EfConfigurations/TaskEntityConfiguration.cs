@@ -19,8 +19,8 @@ namespace Stroom.Server.EfConfigurations
             builder.Property(e => e.DueDate).HasColumnType("datetime");
 
 
-            builder.HasOne(e => e.Assignee).WithMany(user => user.Tasks);
-            builder.HasOne(e => e.Project).WithMany(project => project.Tasks);
+            builder.HasOne(e => e.Assignee).WithMany(user => user.Tasks).HasForeignKey(e => e.AssigneeID);
+            builder.HasOne(e => e.Project).WithMany(project => project.Tasks).HasForeignKey(e => e.ProjectID);
         }
     }
 }

@@ -10,8 +10,7 @@ namespace Stroom.Server.EfConfigurations
         public void Configure(EntityTypeBuilder<TimeEntry> builder)
         {
             builder.ToTable("TimeEntry");
-            //builder.HasKey(e => new { e.TaskID, e.UserID }).HasName("Comment_PK");
-            builder.HasKey(e => e.TimeEntryID).HasName("TimeEntry_PK");
+            builder.HasKey(e => new { e.TaskID, e.UserID }).HasName("TimeEntry_PK");
             builder.Property(e => e.Hours).IsRequired();
             builder.Property(e => e.Date).IsRequired().HasColumnType("datetime");
 

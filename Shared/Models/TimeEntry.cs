@@ -8,12 +8,11 @@ namespace Stroom.Shared.Models
 {
     public class TimeEntry
     {
-        public int TimeEntryID { get; set; }
-        public DateTime? Date { get; set; } = DateTime.Now;
-        public float Hours { get; set; } = 1;
-        public TaskDto Task { get; set; } = new TaskDto();
+        public DateTime? Date { get; set; }
+        public float Hours { get; set; }
+        public TaskDto Task { get; set; }
         public int? TaskID { get; set; }
-        public User User { get; set; } = new User();
+        public User User { get; set; }
         public int? UserID { get; set; }
     }
 }

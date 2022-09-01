@@ -32,6 +32,54 @@ namespace Stroom.Server.Contexts
             modelBuilder.ApplyConfiguration(new CommentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TaskEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectEntityConfiguration());
+
+            var user = new User()
+            {
+                UserID = 1,
+                Name = "Hlib",
+                Surname = "Pivniev",
+                Email = "gl.pvn12@gmail.com",
+                Role = Shared.Enums.UserPropertiesEnums.UserRole.Unassigned,
+            };
+            var project = new ProjectDto()
+            {
+                ProjectID = 1,
+                Name = "Moon colony",
+                Description = "Moon landing program"
+            };
+            var task = new TaskDto()
+            {
+                TaskID = 1,
+                Name = "Change start button color",
+                Description = "Name speaks itself",
+                AssigneeID = 1,
+                Priority = Shared.Enums.TaskPropertiesEnums.TaskPriority.Low,
+                Status = Shared.Enums.TaskPropertiesEnums.TaskStatus.New,
+                EstimatedTime = null,
+                SubmitionDate = DateTime.Now,
+                DueDate = null,
+                ProjectID = 1
+            };
+            var timeEntry = new TimeEntry()
+            {
+                Date = DateTime.Now.AddDays(-2),
+                TaskID = 1,
+                UserID = 1,
+                Hours = 3
+            };
+            var comment = new CommentDto()
+            {
+                TaskID = 1,
+                UserID = 1,
+                TimeStamp = DateTime.Now.AddDays(1),
+                Comment = "Task is complicated..."
+            };
+
+            modelBuilder.Entity<ProjectDto>().HasData(user);
+            modelBuilder.Entity<TaskDto>().HasData(project);
+            modelBuilder.Entity<User>().HasData(task);
+            modelBuilder.Entity<TimeEntry>().HasData(timeEntry);
+            modelBuilder.Entity<CommentDto>().HasData(comment);
         }
     }
 }

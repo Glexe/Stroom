@@ -9,12 +9,12 @@ namespace Stroom.Shared.Models
 {
     public class User
     {
-        public int UserID { get; set; } = 1202;
-        public string Name { get; set; } = "Hlib";
-        public string Surname { get; set; } = "Pivniev";
+        public int UserID { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
         public string FullName => $"{Name} {Surname}";
-        public string Email { get; set; } = "gl.pvn@gmail.com";
-        public UserRole Role { get; set; } = UserRole.Developer;
+        public string Email { get; set; }
+        public UserRole Role { get; set; }
         public virtual IEnumerable<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
         public virtual IEnumerable<TaskDto> Tasks { get; set; } = new List<TaskDto>();
         public virtual IEnumerable<ProjectDto> Projects { get; set; } = new List<ProjectDto>();
