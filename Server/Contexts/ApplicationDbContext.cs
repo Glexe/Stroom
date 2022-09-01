@@ -75,9 +75,9 @@ namespace Stroom.Server.Contexts
                 Comment = "Task is complicated..."
             };
 
-            modelBuilder.Entity<ProjectDto>().HasData(user);
-            modelBuilder.Entity<TaskDto>().HasData(project);
-            modelBuilder.Entity<User>().HasData(task);
+            modelBuilder.Entity<User>().HasData(user);
+            modelBuilder.Entity<ProjectDto>().HasData(project);
+            modelBuilder.Entity<TaskDto>().HasData(task);
             modelBuilder.Entity<TimeEntry>().HasData(timeEntry);
             modelBuilder.Entity<CommentDto>().HasData(comment);
         }

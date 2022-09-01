@@ -1,5 +1,6 @@
 ﻿using Stroom.Server.Contexts;
 using Stroom.Shared.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Stroom.Server.Repositories
 {
@@ -24,7 +25,7 @@ namespace Stroom.Server.Repositories
 
         public IEnumerable<TaskDto> Get()
         {
-            return TaskContext.Tasks.ToList();
+            return TaskContext.Tasks.Include(e => e.Project).ToList();
         }
 
         public TaskDto Get(int taskId)

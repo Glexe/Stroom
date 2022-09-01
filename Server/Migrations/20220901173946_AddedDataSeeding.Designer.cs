@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stroom.Server.Contexts;
 
@@ -11,9 +12,10 @@ using Stroom.Server.Contexts;
 namespace Stroom.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class TaskContextModelSnapshot : ModelSnapshot
+    [Migration("20220901173946_AddedDataSeeding")]
+    partial class AddedDataSeeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
