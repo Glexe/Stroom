@@ -25,5 +25,26 @@ namespace Stroom.Shared.Models
         public int ProjectID { get; set; }
         public virtual List<CommentDto> Comments { get; set; } = new List<CommentDto>();
         public virtual ICollection<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
+
+        public static TaskDto Clone(TaskDto clone)
+        {
+            return new TaskDto()
+            {
+                TaskID = clone.TaskID,
+                Name = clone.Name,
+                Description = clone.Description,
+                Priority = clone.Priority, 
+                Status = clone.Status,
+                Assignee = clone.Assignee, 
+                AssigneeID = clone.AssigneeID,
+                Comments = clone.Comments, 
+                DueDate = clone.DueDate,
+                EstimatedTime = clone.EstimatedTime,
+                Project = clone.Project,
+                ProjectID = clone.ProjectID,
+                SubmitionDate = clone.SubmitionDate,
+                TimeEntries = clone.TimeEntries
+            };
+        }
     }
 }

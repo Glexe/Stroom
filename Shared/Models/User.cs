@@ -30,5 +30,21 @@ namespace Stroom.Shared.Models
         public override int GetHashCode() => FullName?.GetHashCode() ?? 0;
 
         public override string ToString() => FullName;
+
+        public static User Clone(User clone)
+        {
+            return new User()
+            {
+                UserID = clone.UserID,
+                Name = clone.Name,
+                Surname = clone.Surname,
+                Email = clone.Email,
+                Role = clone.Role,
+                TimeEntries = clone.TimeEntries,
+                Tasks = clone.Tasks,
+                Projects = clone.Projects,
+                Comments = clone.Comments
+            };
+        }
     }
 }

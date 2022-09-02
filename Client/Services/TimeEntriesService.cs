@@ -1,4 +1,5 @@
-﻿ using Stroom.Shared.Models;
+﻿using Stroom.Server.Helpers;
+using Stroom.Shared.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,13 +15,10 @@ namespace Stroom.Client.Services
             Client = client;
         }
 
-        public async void AddAsync(TimeEntry timeEntry)
+        public async void AddAsync(TimeEntry timeEntrySource)
         {
-            timeEntry.UserID = timeEntry.User.UserID;
-            timeEntry.TaskID = timeEntry.Task.TaskID;
-            timeEntry.Task.TimeEntries.Clear();
-            timeEntry.User.TimeEntries.Clear();
-
+            var timeEntry = new TimeEntry() { Hours = timeEntrySource.Hours, Date = timeEntrySource.Date, TaskID = timeEntrySource.Task.TaskID, UserID = timeEntrySource.Task.AssigneeID, Task = TaskDto.Clone(timeEntrySource.Task), User = User.Clone(timeEntrySource.User) };
+            ValidateTimeEntry(timeEntry);
             var json = JsonSerializer.Serialize(timeEntry, new JsonSerializerOptions()
             {
                 WriteIndented = true,
@@ -40,7 +38,10 @@ namespace Stroom.Client.Services
 
         private void ValidateTimeEntry(TimeEntry timeEntry)
         {
-            
+            //timeEntry.UserID = timeEntry.User.UserID;
+            //timeEntry.TaskID = timeEntry.Task.TaskID;
+            timeEntry.Task.TimeEntries.Clear();
+            timeEntry.User.TimeEntries.Clear();
         }
     }
 }
