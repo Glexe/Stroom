@@ -6,18 +6,18 @@ namespace Stroom.Server.Repositories
 {
     public class TasksRepository : ITasksRepository
     {
-        private readonly ApplicationDbContext ApplicationContext;
+        private readonly ApplicationDbContext ApplicationDbContext;
 
         public TasksRepository(ApplicationDbContext applicationContext)
         {
-            ApplicationContext = applicationContext;
+            ApplicationDbContext = applicationContext;
         }
         
         public TaskDto Add(TaskDto task)
         {
-            ApplicationContext.Entry(task.Project).State = EntityState.Unchanged;
-            ApplicationContext.Entry(task.Assignee).State = EntityState.Unchanged;
-            ApplicationContext.Add(task);
+            ApplicationDbContext.Entry(task.Project).State = EntityState.Unchanged;
+            ApplicationDbContext.Entry(task.Assignee).State = EntityState.Unchanged;
+            ApplicationDbContext.Add(task);
             return task;
         }
 
@@ -28,12 +28,27 @@ namespace Stroom.Server.Repositories
 
         public IEnumerable<TaskDto> Get()
         {
-            return ApplicationContext.Tasks.Include(e => e.Project).ToList();            
+            var tasks = ApplicationDbContext.Tasks.Include(e => e.Project).ToList();
+            foreach (var task in tasks)
+            {
+                ResolveTaskReferences(task);
+            }
+
+            return tasks;
         }
 
         public TaskDto Get(int taskId)
         {
-            return ApplicationContext.Tasks.Include(e => e.Project).First(e => e.TaskID == taskId);
+            var task = ApplicationDbContext.Tasks.Include(e => e.Project).First(e => e.TaskID == taskId);
+            ResolveTaskReferences(task);
+
+            return task;
+        }
+
+        private void ResolveTaskReferences(TaskDto task)
+        {
+            task.Assignee = ApplicationDbContext.Users.AsNoTracking().IgnoreAutoIncludes().First(e => e.UserID == task.AssigneeID);
+            task.TimeEntries = ApplicationDbContext.TimeEntries.AsNoTracking().IgnoreAutoIncludes().Where(e => e.TaskID == task.TaskID).ToList();
         }
 
         public TaskDto Modify(int taskId, TaskDto task)
@@ -43,7 +58,15 @@ namespace Stroom.Server.Repositories
 
         public bool SaveChanges()
         {
-            return ApplicationContext.SaveChanges() == 1;
+            return ApplicationDbContext.SaveChanges() == 1;
+        }
+
+        public TaskDto Update(TaskDto task)
+        {
+            ApplicationDbContext.Entry(task.Project).State = EntityState.Unchanged;
+            ApplicationDbContext.Entry(task.Assignee).State = EntityState.Unchanged;
+            ApplicationDbContext.Update(task);
+            return task;
         }
     }
 }

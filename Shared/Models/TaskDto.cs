@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using System.Threading.Tasks;
 using static Stroom.Shared.Enums.TaskPropertiesEnums;
 
@@ -15,7 +16,7 @@ namespace Stroom.Shared.Models
         public TaskPriority Priority { get; set; }
         public Enums.TaskPropertiesEnums.TaskStatus Status { get; set; }
         public float? EstimatedTime { get; set; }
-        public float WorkedTime => TimeEntries?.Sum(timeEntry => timeEntry.Hours) ?? 0;
+        public float WorkedTime => TimeEntries?.Sum(timeEntry => timeEntry?.Hours) ?? 0;
         public DateTime? SubmitionDate { get; set; }
         public DateTime? DueDate { get; set; }
         public User Assignee { get; set; }
@@ -23,6 +24,6 @@ namespace Stroom.Shared.Models
         public ProjectDto Project { get; set; }
         public int ProjectID { get; set; }
         public virtual List<CommentDto> Comments { get; set; } = new List<CommentDto>();
-        public virtual ICollection<TimeEntry> TimeEntries { get; set; }
+        public virtual ICollection<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
     }
 }

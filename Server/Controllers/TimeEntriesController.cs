@@ -25,6 +25,14 @@ namespace Stroom.Server.Controllers
         public ActionResult<IEnumerable<TimeEntry>> Get()
         {
             return Ok(TimeEntryRepository.Get());
+        }   
+        
+        [HttpPost]
+        public ActionResult Add(TimeEntry timeEntry)
+        {
+            TimeEntryRepository.Add(timeEntry);
+            var res = TimeEntryRepository.SaveChanges();
+            return Ok(res);
         }
     }
 }

@@ -35,6 +35,14 @@ namespace Stroom.Server.Controllers
             return Ok(test);
         } 
 
+        [HttpPost("update")]
+        public ActionResult Update([FromBody] TaskDto task)
+        {
+            TasksRepository.Update(task);
+            var test = TasksRepository.SaveChanges();
+            return Ok(test);
+        } 
+
         [HttpGet("{taskId}")]
         public ActionResult<TaskDto> Get(int taskId)
         {

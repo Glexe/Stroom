@@ -15,7 +15,7 @@ namespace Stroom.Shared.Models
         public string FullName => $"{Name} {Surname}";
         public string Email { get; set; }
         public UserRole Role { get; set; }
-        public virtual IEnumerable<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
+        public virtual List<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
         public virtual IEnumerable<TaskDto> Tasks { get; set; } = new List<TaskDto>();
         public virtual IEnumerable<ProjectDto> Projects { get; set; } = new List<ProjectDto>();
         public virtual IEnumerable<CommentDto> Comments { get; set; } = new List<CommentDto>();

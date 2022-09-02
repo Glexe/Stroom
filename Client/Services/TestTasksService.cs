@@ -31,6 +31,13 @@ namespace Stroom.Client.Services
             return await Client.GetFromJsonAsync<TaskDto>($"api/Tasks/{taskId}");
         }
 
+        public async void Update(TaskDto task)
+        {
+            ValidateTaskDto(task);
+
+            await Client.PostAsJsonAsync<TaskDto>("api/Tasks/update", task);
+        }
+
         private void ValidateTaskDto(TaskDto task)
         {
             if (task.Description is null) task.Description = "";

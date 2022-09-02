@@ -15,7 +15,11 @@ namespace Stroom.Server.Repositories
 
         public TimeEntry Add(TimeEntry timeEntry)
         {
-            throw new NotImplementedException();
+            ApplicationDbContext.Entry(timeEntry.User).State = EntityState.Unchanged;
+            ApplicationDbContext.Entry(timeEntry.Task).State = EntityState.Unchanged;
+            ApplicationDbContext.Add(timeEntry);
+
+            return timeEntry;
         }
 
         public TimeEntry Delete(TimeEntry timeEntry)
@@ -36,7 +40,7 @@ namespace Stroom.Server.Repositories
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return ApplicationDbContext.SaveChanges() == 1;
         }
     }
 }

@@ -52,12 +52,15 @@
                         }
                     </MudSelect>
                     <MudSelect Required="true" T="User" @bind-Value="Task.Assignee" Label="Assignee" AnchorOrigin="Origin.BottomCenter">
-                        @{
-                            foreach (var user in Users)
+                    @{
+                            if(Users != null && Users.Any())
+                            {
+                                foreach (var user in Users)
                                 {
                                     <MudSelectItem Value="@user" />
                                 }
-                        }
+                            }
+                    }
                     </MudSelect>
                 </MudStack>
             </MudItem>

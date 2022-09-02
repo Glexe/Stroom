@@ -7,5 +7,6 @@ namespace Stroom.Client.Services
         public Task<TaskDto[]> GetAsync();
         public Task<TaskDto> GetAsync(int taskId);
         public void AddAsync(TaskDto task);
+        public void Update(TaskDto task);
     }
 }

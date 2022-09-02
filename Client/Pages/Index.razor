@@ -4,7 +4,6 @@
 @using Stroom.Client.Components
 @inject ITasksService TasksService
 @inject ITimeEntriesService TimeEntriesService
-@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
 <style>
     .href-text {
@@ -30,18 +29,10 @@
 @code {
     private IEnumerable<TaskDto> TasksAssignedToUser = new List<TaskDto>();
     private IEnumerable<TimeEntry> TimneEntries = new List<TimeEntry>();
-    private User CurrentUser = new User();
 
     protected override async Task OnInitializedAsync()
     {
         TasksAssignedToUser = await TasksService.GetAsync();
         TimneEntries = await TimeEntriesService.GetAsync();
-    }
-
-    private void test()
-    {
-        var authstate = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
-        var user = authstate.User;
-        var name = user.Identity.Name;
     }
 }

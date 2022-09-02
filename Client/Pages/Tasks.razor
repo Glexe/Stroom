@@ -10,6 +10,7 @@
 @inject HttpClient Http
 @inject IProjectsService ProjectsService
 @inject ITasksService TasksService
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
 <PageTitle>Tasks</PageTitle>
 
@@ -54,7 +55,7 @@
     </div>
     @foreach(var statusName in TaskPropertiesEnums.TaskStatuses)
     {
-        var tasksFiltered = AllTasks.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee == CurrentUser))).ToList();
+        var tasksFiltered = AllTasks.Where(i => i.Status == statusName && ((SelectedProjectName == AllProjectsButtonText) || (SelectedProjectName != AllProjectsButtonText && i.Project.Name == SelectedProjectName)) && ((!AssignedToMeOnly) || (AssignedToMeOnly && i.Assignee.Email == CurrentUserEmail))).ToList();
         var tasksCount = tasksFiltered.Count;
         if (tasksCount < 1) continue;
         ProjectHasAnyTasksAssigned = true;
@@ -123,6 +124,7 @@
     private string SelectedProjectName = "All projects";
     private User CurrentUser = new User() { Name = "Emma Wills" };
     private string SearchString = "";
+    private string CurrentUserEmail = "";
 
     private int PagesCount => (int) (Math.Ceiling(((double)AllTasks.Count() / (double)RowsPerPage)));
 
@@ -132,6 +134,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        CurrentUserEmail = GetCurrentUserMail();
         AllTasks = await TasksService.GetAsync();
         ProjectNames = (await ProjectsService.GetAsync()).Select(result => result.Name).ToList();
     }
@@ -163,5 +166,12 @@
         if (task.TaskID.ToString().Contains(SearchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    private string GetCurrentUserMail()
+    {
+        var authstate = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+        var user = authstate.User;
+        return user.Identity.Name;
     }
 }

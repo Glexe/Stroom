@@ -8,6 +8,7 @@ namespace Stroom.Shared.Models
 {
     public class TimeEntry
     {
+        public int TimeEntryID { get; set; }
         public DateTime? Date { get; set; }
         public float Hours { get; set; }
         public virtual TaskDto Task { get; set; }

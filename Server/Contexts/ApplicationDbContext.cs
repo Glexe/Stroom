@@ -64,6 +64,7 @@ namespace Stroom.Server.Contexts
             };
             var timeEntry = new TimeEntry()
             {
+                TimeEntryID = 1,
                 Date = DateTime.Now.AddDays(-2),
                 TaskID = 1,
                 UserID = 1,
