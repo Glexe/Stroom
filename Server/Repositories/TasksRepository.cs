@@ -39,7 +39,7 @@ namespace Stroom.Server.Repositories
 
         public TaskDto Get(int taskId)
         {
-            var task = ApplicationDbContext.Tasks.Include(e => e.Project).First(e => e.TaskID == taskId);
+            var task = ApplicationDbContext.Tasks.Include(e => e.Project).FirstOrDefault(e => e.TaskID == taskId);
             ResolveTaskReferences(task);
 
             return task;
@@ -54,11 +54,6 @@ namespace Stroom.Server.Repositories
             {
                 comment.User = ApplicationDbContext.Users.AsNoTracking().IgnoreAutoIncludes().First(e => e.UserID == comment.UserID);
             }
-        }
-
-        public TaskDto Modify(int taskId, TaskDto task)
-        {
-            throw new NotImplementedException();
         }
 
         public bool SaveChanges()

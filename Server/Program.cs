@@ -38,6 +38,7 @@ namespace Stroom
             builder.Services.AddScoped<ITasksRepository, TasksRepository>();
             builder.Services.AddScoped<ITimeEntriesRepository, TimeEntriesRepository>();
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+            builder.Services.AddScoped<IUserRolesRepository, UserRolesRepository>();
             builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 
 

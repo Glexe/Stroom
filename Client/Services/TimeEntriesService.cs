@@ -18,7 +18,6 @@ namespace Stroom.Client.Services
         public async void AddAsync(TimeEntry timeEntrySource)
         {
             var timeEntry = new TimeEntry() { Hours = timeEntrySource.Hours, Date = timeEntrySource.Date, TaskID = timeEntrySource.Task.TaskID, UserID = timeEntrySource.Task.AssigneeID, Task = TaskDto.Clone(timeEntrySource.Task), User = User.Clone(timeEntrySource.User) };
-            ValidateTimeEntry(timeEntry);
             var json = JsonSerializer.Serialize(timeEntry, new JsonSerializerOptions()
             {
                 WriteIndented = true,
@@ -34,14 +33,6 @@ namespace Stroom.Client.Services
         public async Task<TimeEntry[]> GetAsync()
         {
             return await Client.GetFromJsonAsync<TimeEntry[]>("api/TimeEntries");
-        }
-
-        private void ValidateTimeEntry(TimeEntry timeEntry)
-        {
-            //timeEntry.UserID = timeEntry.User.UserID;
-            //timeEntry.TaskID = timeEntry.Task.TaskID;
-            timeEntry.Task.TimeEntries.Clear();
-            timeEntry.User.TimeEntries.Clear();
         }
     }
 }

@@ -18,7 +18,8 @@ namespace Stroom.Client.Services
         {
             ValidateTaskDto(task);
 
-            await Client.PostAsJsonAsync<TaskDto>("api/Tasks", task);
+            var res = await Client.PostAsJsonAsync<TaskDto>("api/Tasks", task);
+            var test = res.Content.ReadAsStringAsync().Result;
         }
 
         public async Task<TaskDto[]> GetAsync()
@@ -33,9 +34,11 @@ namespace Stroom.Client.Services
 
         public async void Update(TaskDto task)
         {
-            ValidateTaskDto(task);
+            var taskClone = TaskDto.Clone(task);
+            ValidateTaskDto(taskClone);
 
-            await Client.PostAsJsonAsync<TaskDto>("api/Tasks/update", task);
+            var result = await Client.PostAsJsonAsync<TaskDto>("api/Tasks/update", taskClone);
+            var test = result.Content.ReadAsStringAsync().Result;
         }
 
         private void ValidateTaskDto(TaskDto task)
@@ -43,8 +46,9 @@ namespace Stroom.Client.Services
             if (task.Description is null) task.Description = "";
             if (task.AssigneeID == 0) task.AssigneeID = task.Assignee.UserID;
             if (task.ProjectID == 0) task.ProjectID = task.Project.ProjectID;
-            if (task.TimeEntries is null) task.TimeEntries = new List<TimeEntry>();
-            if (task.Comments is null) task.Comments = new List<CommentDto>();
+            task.TimeEntries = new List<TimeEntry>();
+            task.Comments = new List<CommentDto>();
+            task.Assignee.UserRoles = new List<UserRoleDto>();
         }
     }
 }

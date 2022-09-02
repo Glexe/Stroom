@@ -6,11 +6,11 @@ namespace Stroom.Server.Repositories
 {
     public class UsersRepository : IUsersRepository
     {
-        private readonly ApplicationDbContext TaskContext;
+        private readonly ApplicationDbContext ApplicationDbContext;
 
-        public UsersRepository(ApplicationDbContext taskContext)
+        public UsersRepository(ApplicationDbContext applicationDbContext)
         {
-            TaskContext = taskContext;
+            ApplicationDbContext = applicationDbContext;
         }
 
         public User Add(User user)
@@ -25,17 +25,24 @@ namespace Stroom.Server.Repositories
 
         public IEnumerable<User> Get()
         {
-            return TaskContext.Users.ToList();
+            var users = ApplicationDbContext.Users.ToList();
+            foreach (var user in users)
+            {
+                user.UserRoles = ApplicationDbContext.UserRoles.AsNoTracking().IgnoreAutoIncludes().Where(e => e.UserID == user.UserID).ToList();
+            }
+            return users;
         }
 
         public User Get(int userId)
         {
-            return TaskContext.Users.Find(userId);
+            var user = ApplicationDbContext.Users.Find(userId);
+            user.UserRoles = ApplicationDbContext.UserRoles.AsNoTracking().IgnoreAutoIncludes().Where(e => e.UserID == user.UserID).ToList();
+            return user;
         }
 
         public bool SaveChanges()
         {
-            return TaskContext.SaveChanges() == 1;
+            return ApplicationDbContext.SaveChanges() == 1;
         }
     }
 }

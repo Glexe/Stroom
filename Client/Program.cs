@@ -29,6 +29,7 @@ namespace Stroom.Client
             builder.Services.AddScoped<ITimeEntriesService, TimeEntriesService>();
             builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
+            builder.Services.AddScoped<IUserRoleService, UserRoleService>();
             builder.Services.AddScoped<IClipboardService, ClipboardService>();
 
             await builder.Build().RunAsync();

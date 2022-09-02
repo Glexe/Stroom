@@ -14,11 +14,11 @@ namespace Stroom.Server.EfConfigurations
             builder.Property(e => e.Name).IsRequired().HasMaxLength(256);
             builder.Property(e => e.Surname).IsRequired().HasMaxLength(256);
             builder.Property(e => e.Email).IsRequired().HasMaxLength(256);
-            builder.Property(e => e.Role).IsRequired();
 
             builder.HasMany(e => e.Tasks).WithOne(task => task.Assignee);
 
             builder.HasMany(e => e.Projects);
+            builder.HasMany(e => e.UserRoles);
         }
     }
 }

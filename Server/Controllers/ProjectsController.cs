@@ -54,6 +54,7 @@ namespace Stroom.Server.Controllers
         }
         
         [HttpGet("/generate-invitation-token/{projectId}")]
+        [AllowAnonymous]
         public ActionResult<string> GenerateInvitationToken(int projectId)
         {
             //select invite_link from project where pro_id = id

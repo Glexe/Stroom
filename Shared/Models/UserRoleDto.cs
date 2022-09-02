@@ -11,8 +11,20 @@ namespace Stroom.Shared.Models
     {
         public int UserID { get; set; }
         public User User { get; set; }
-        public TaskDto Task { get; set; }
-        public int TaskID { get; set; }
+        public ProjectDto Project { get; set; }
+        public int ProjectID { get; set; }
         public UserRole Role { get; set; }
+
+        public static UserRoleDto Clone(UserRoleDto clone)
+        {
+            return new UserRoleDto()
+            {
+                UserID = clone.UserID,
+                ProjectID = clone.ProjectID,
+                Project = clone.Project,
+                Role = clone.Role,
+                User = clone.User
+            };
+        }
     }
 }

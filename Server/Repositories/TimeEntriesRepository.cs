@@ -15,6 +15,10 @@ namespace Stroom.Server.Repositories
 
         public TimeEntry Add(TimeEntry timeEntry)
         {
+            timeEntry.Task.Comments.Clear();
+            timeEntry.Task.TimeEntries.Clear();
+            timeEntry.User.Comments.Clear();
+            timeEntry.User.TimeEntries.Clear();
             ApplicationDbContext.Entry(timeEntry.User).State = EntityState.Unchanged;
             ApplicationDbContext.Entry(timeEntry.Task).State = EntityState.Unchanged;
             ApplicationDbContext.Add(timeEntry);

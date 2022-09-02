@@ -1,6 +1,9 @@
-﻿@using Stroom.Shared.Enums
+﻿@using Stroom.Client.Services
+@using Stroom.Shared.Enums
 @using Stroom.Shared.Models
 @using static Stroom.Shared.Enums.UserPropertiesEnums
+@inject IUserRoleService UserRoleService
+@inject IProjectsService ProjectsService
 
 <MudDialog>
     <DialogContent>
@@ -21,18 +24,23 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public User User { get; set; }
+    [Parameter] public int ProjectID { get; set; }
+    [Parameter] public ProjectDto Project { get; set; }
     private UserPropertiesEnums.UserRole UserRole { get; set; }
+    private UserRoleDto UserRoleDto { get; set; }
 
     protected override void OnInitialized()
     {
-        UserRole = User.Role;
+        UserRoleDto = User.UserRoles.First(e => e.ProjectID == ProjectID);
+        UserRole = UserRoleDto.Role;
     }
 
     private void Save()
     {
-
-        //SaveChanges();
-        User.Role = UserRole;
+        UserRoleDto.User = User.Clone(User);
+        UserRoleDto.Project = ProjectDto.Clone(Project);
+        UserRoleDto.Role = UserRole;
+        UserRoleService.Modify(UserRoleDto);
         MudDialog.Close(DialogResult.Ok(true));
     }
     private void Cancel() => MudDialog.Cancel();

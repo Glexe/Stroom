@@ -14,11 +14,11 @@ namespace Stroom.Shared.Models
         public string Surname { get; set; }
         public string FullName => $"{Name} {Surname}";
         public string Email { get; set; }
-        public UserRole Role { get; set; }
         public virtual List<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
-        public virtual IEnumerable<TaskDto> Tasks { get; set; } = new List<TaskDto>();
-        public virtual IEnumerable<ProjectDto> Projects { get; set; } = new List<ProjectDto>();
-        public virtual IEnumerable<CommentDto> Comments { get; set; } = new List<CommentDto>();
+        public virtual List<TaskDto> Tasks { get; set; } = new List<TaskDto>();
+        public virtual List<ProjectDto> Projects { get; set; } = new List<ProjectDto>();
+        public virtual List<CommentDto> Comments { get; set; } = new List<CommentDto>();
+        public virtual List<UserRoleDto> UserRoles { get; set; } = new List<UserRoleDto>();
 
 
         public override bool Equals(object o)
@@ -39,11 +39,11 @@ namespace Stroom.Shared.Models
                 Name = clone.Name,
                 Surname = clone.Surname,
                 Email = clone.Email,
-                Role = clone.Role,
                 TimeEntries = clone.TimeEntries,
                 Tasks = clone.Tasks,
                 Projects = clone.Projects,
-                Comments = clone.Comments
+                Comments = clone.Comments,
+                UserRoles = clone.UserRoles
             };
         }
     }

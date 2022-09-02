@@ -15,6 +15,7 @@ namespace Stroom.Server.Contexts
         public virtual DbSet<TimeEntry> TimeEntries { get; set; }
         public virtual DbSet<CommentDto> Comments { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserRoleDto> UserRoles { get; set; }
 
         private readonly IConfiguration _configuration;
 
@@ -35,14 +36,14 @@ namespace Stroom.Server.Contexts
             modelBuilder.ApplyConfiguration(new CommentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new TaskEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoletEntityConfiguration());
 
             var user = new User()
             {
                 UserID = 1,
                 Name = "Hlib",
                 Surname = "Pivniev",
-                Email = "gl.pvn12@gmail.com",
-                Role = Shared.Enums.UserPropertiesEnums.UserRole.Unassigned,
+                Email = "gl.pvn12@gmail.com"
             };
             var project = new ProjectDto()
             {
@@ -79,12 +80,19 @@ namespace Stroom.Server.Contexts
                 TimeStamp = DateTime.Now.AddDays(1),
                 Comment = "Task is complicated..."
             };
+            var userRole = new UserRoleDto()
+            {
+                ProjectID = 1,
+                UserID = 1,
+                Role = Shared.Enums.UserPropertiesEnums.UserRole.Developer
+            };
 
             modelBuilder.Entity<User>().HasData(user);
             modelBuilder.Entity<ProjectDto>().HasData(project);
             modelBuilder.Entity<TaskDto>().HasData(task);
             modelBuilder.Entity<TimeEntry>().HasData(timeEntry);
             modelBuilder.Entity<CommentDto>().HasData(comment);
+            modelBuilder.Entity<UserRoleDto>().HasData(userRole);
         }
     }
 }

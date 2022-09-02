@@ -74,14 +74,14 @@
                     <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Name)">Name</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<User, object>(user => user.Surname)">Surname</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Email)">Email</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.Role.ToString())">Role</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<User, object>(user => user.UserRoles.First(e => e.ProjectID == this.ProjectID).ToString())">Role</MudTableSortLabel></MudTh>
                     <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Surname">@context.Surname</MudTd>
                     <MudTd DataLabel="Email">@context.Email</MudTd>
-                    <MudTd DataLabel="Role">@context.Role</MudTd>
+                    <MudTd DataLabel="Role">@context.UserRoles.FirstOrDefault(e => e.ProjectID == this.ProjectID)?.Role.ToString()</MudTd>
                     <MudTd DataLabel="Actions">
                         <MudStack Row="true" Spacing="4">
                             <MudButton OnClick="@(async () => await RemoveUser(@context))" Variant="Variant.Filled" Color="Color.Error">Remove</MudButton>
@@ -150,6 +150,8 @@
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters();
         parameters.Add("User", user);
+        parameters.Add("ProjectID", ProjectID);
+        parameters.Add("Project", Project);
 
         var res = await DialogService.Show<EditProjectUserDialog>("Edit", parameters, options).Result;
         //if (!res.Cancelled)

@@ -14,8 +14,7 @@ namespace Stroom.Client.Services
 
         public async void AddAsync(ProjectDto project)
         {
-            var result = await Client.PostAsJsonAsync<ProjectDto>("api/Projects", project);
-            var test = result.Content.ReadAsStringAsync().Result;
+            await Client.PostAsJsonAsync<ProjectDto>("api/Projects", project);
         }
 
         public Task<ProjectDto> AddUserToProject(int projectId, string token)

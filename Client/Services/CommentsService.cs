@@ -33,6 +33,7 @@ namespace Stroom.Client.Services
         private void ValidateComment(CommentDto comment)
         {
             comment.User.Comments = new List<CommentDto>();
+            comment.User.UserRoles = new List<UserRoleDto>();
             comment.Task.Comments = new List<CommentDto>();
             comment.User.TimeEntries = new List<TimeEntry>();
             comment.Task.TimeEntries = new List<TimeEntry>();
