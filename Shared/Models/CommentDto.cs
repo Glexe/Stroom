@@ -8,6 +8,7 @@ namespace Stroom.Shared.Models
 {
     public class CommentDto
     {
+        public int CommentID { get; set; }
         public string Comment { get; set; }
         public DateTime TimeStamp { get; set; }
         public virtual User User { get; set; }

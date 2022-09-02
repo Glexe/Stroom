@@ -10,7 +10,8 @@ namespace Stroom.Server.EfConfigurations
         public void Configure(EntityTypeBuilder<CommentDto> builder)
         {
             builder.ToTable("Comment");
-            builder.HasKey(e => new { e.TaskID, e.UserID }).HasName("Comment_PK");
+            builder.HasKey(e => e.CommentID).HasName("Comment_PK");
+            //builder.HasKey(e => new { e.TaskID, e.UserID }).HasName("Comment_PK");
             builder.Property(e => e.Comment).IsRequired().HasMaxLength(1024);
             builder.Property(e => e.TimeStamp).IsRequired().HasColumnType("datetime");
 

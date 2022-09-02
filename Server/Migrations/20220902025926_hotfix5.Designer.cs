@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stroom.Server.Contexts;
 
@@ -11,9 +12,10 @@ using Stroom.Server.Contexts;
 namespace Stroom.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220902025926_hotfix5")]
+    partial class hotfix5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,32 +26,22 @@ namespace Stroom.Server.Migrations
 
             modelBuilder.Entity("Stroom.Shared.Models.CommentDto", b =>
                 {
-                    b.Property<int>("CommentID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int?>("TaskID")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentID"), 1L, 1);
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<int?>("TaskID")
-                        .IsRequired()
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("UserID")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.HasKey("CommentID")
+                    b.HasKey("TaskID", "UserID")
                         .HasName("Comment_PK");
-
-                    b.HasIndex("TaskID");
 
                     b.HasIndex("UserID");
 
@@ -58,11 +50,10 @@ namespace Stroom.Server.Migrations
                     b.HasData(
                         new
                         {
-                            CommentID = 1,
-                            Comment = "Task is complicated...",
                             TaskID = 1,
-                            TimeStamp = new DateTime(2022, 9, 3, 5, 31, 7, 886, DateTimeKind.Local).AddTicks(734),
-                            UserID = 1
+                            UserID = 1,
+                            Comment = "Task is complicated...",
+                            TimeStamp = new DateTime(2022, 9, 3, 4, 59, 26, 441, DateTimeKind.Local).AddTicks(2211)
                         });
                 });
 
@@ -157,13 +148,13 @@ namespace Stroom.Server.Migrations
                             TaskID = 1,
                             AssigneeID = 1,
                             Description = "Name speaks itself",
-                            DueDate = new DateTime(2022, 9, 9, 5, 31, 7, 886, DateTimeKind.Local).AddTicks(726),
+                            DueDate = new DateTime(2022, 9, 9, 4, 59, 26, 441, DateTimeKind.Local).AddTicks(2200),
                             EstimatedTime = 13f,
                             Name = "Change start button color",
                             Priority = 0,
                             ProjectID = 1,
                             Status = 0,
-                            SubmitionDate = new DateTime(2022, 9, 2, 5, 31, 7, 886, DateTimeKind.Local).AddTicks(687)
+                            SubmitionDate = new DateTime(2022, 9, 2, 4, 59, 26, 441, DateTimeKind.Local).AddTicks(2160)
                         });
                 });
 
@@ -203,7 +194,7 @@ namespace Stroom.Server.Migrations
                         new
                         {
                             TimeEntryID = 1,
-                            Date = new DateTime(2022, 8, 31, 5, 31, 7, 886, DateTimeKind.Local).AddTicks(729),
+                            Date = new DateTime(2022, 8, 31, 4, 59, 26, 441, DateTimeKind.Local).AddTicks(2205),
                             Hours = 3f,
                             TaskID = 1,
                             UserID = 1

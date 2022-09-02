@@ -13,6 +13,7 @@ namespace Stroom.Server.Contexts
         public virtual DbSet<TaskDto> Tasks { get; set; }
         public virtual DbSet<ProjectDto> Projects { get; set; }
         public virtual DbSet<TimeEntry> TimeEntries { get; set; }
+        public virtual DbSet<CommentDto> Comments { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         private readonly IConfiguration _configuration;
@@ -72,6 +73,7 @@ namespace Stroom.Server.Contexts
             };
             var comment = new CommentDto()
             {
+                CommentID = 1,
                 TaskID = 1,
                 UserID = 1,
                 TimeStamp = DateTime.Now.AddDays(1),

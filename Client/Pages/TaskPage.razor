@@ -10,7 +10,10 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject ITasksService TasksService
+@inject IUsersService UsersService
 @inject ITimeEntriesService TimeEntriesService
+@inject ICommentsService CommentsService
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
 <style>
     .href-text {
@@ -142,6 +145,7 @@
     private bool IsHoursFormOpen { get; set; } = false;
     private bool NewCommentHasErrors { get; set; } = false;
     private bool OrderCommentsDescending { get; set; } = true;
+    private User CurrentUser {get;set;}
 
     private string NewCommentText;
     private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
@@ -152,6 +156,8 @@
         if(task is null) NavigationManager.NavigateTo("error");
 
         Task = task;
+        var currentUserEmail = await GetCurrentUserMail();
+        CurrentUser = (await UsersService.GetAsync()).First(e => e.Email == currentUserEmail);
     }
 
     private void FlipSortDirection(){
@@ -195,7 +201,7 @@
             Task.TimeEntries.Add(NewTimeEntry);
             TimeEntriesService.AddAsync(NewTimeEntry);
         }
-        
+
         NewTimeEntry = new TimeEntry();
         ToggleOpenHoursForm();
     }
@@ -205,8 +211,18 @@
         NewCommentHasErrors = string.IsNullOrWhiteSpace(NewCommentText);
         if (NewCommentHasErrors) return;
 
-        Task.Comments.Add(new CommentDto() { TimeStamp = DateTime.Now, Comment = NewCommentText });
+        var newComm = new CommentDto() { TimeStamp = DateTime.Now, Comment = NewCommentText, TaskID = TaskID, UserID = CurrentUser.UserID, User = User.Clone(CurrentUser), Task = TaskDto.Clone(this.Task) };
+        Task.Comments.Add(newComm);
         Task.Comments = Task.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
         NewCommentText = "";
+
+        CommentsService.AddAsync(newComm);
+    }
+
+    private async Task<string> GetCurrentUserMail()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        return user.Identity.Name;
     }
 }

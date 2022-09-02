@@ -134,7 +134,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        CurrentUserEmail = GetCurrentUserMail();
+        CurrentUserEmail = await GetCurrentUserMail();
         AllTasks = await TasksService.GetAsync();
         ProjectNames = (await ProjectsService.GetAsync()).Select(result => result.Name).ToList();
     }
@@ -168,9 +168,9 @@
         return false;
     }
 
-    private string GetCurrentUserMail()
+    private async Task<string> GetCurrentUserMail()
     {
-        var authstate = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
         var user = authstate.User;
         return user.Identity.Name;
     }

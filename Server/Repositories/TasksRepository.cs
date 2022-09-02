@@ -49,6 +49,11 @@ namespace Stroom.Server.Repositories
         {
             task.Assignee = ApplicationDbContext.Users.AsNoTracking().IgnoreAutoIncludes().First(e => e.UserID == task.AssigneeID);
             task.TimeEntries = ApplicationDbContext.TimeEntries.AsNoTracking().IgnoreAutoIncludes().Where(e => e.TaskID == task.TaskID).ToList();
+            task.Comments = ApplicationDbContext.Comments.AsNoTracking().IgnoreAutoIncludes().Where(e => e.TaskID == task.TaskID).ToList();
+            foreach (var comment in task.Comments)
+            {
+                comment.User = ApplicationDbContext.Users.AsNoTracking().IgnoreAutoIncludes().First(e => e.UserID == comment.UserID);
+            }
         }
 
         public TaskDto Modify(int taskId, TaskDto task)

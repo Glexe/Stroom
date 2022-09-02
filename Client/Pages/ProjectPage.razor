@@ -11,6 +11,7 @@
 @inject NavigationManager NavigationManager
 @inject ITasksService TasksService
 @inject IProjectsService ProjectsService
+@inject IUsersService UsersService
 @inject IDialogService DialogService
 
 <style>
@@ -125,12 +126,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TasksAssignedToUser = await TasksService.GetAsync();
+        TasksAssignedToUser = (await TasksService.GetAsync()).Where(e => e.ProjectID == ProjectID);
         Project = await ProjectsService.GetAsync(ProjectID);
-        Users = new List<User>()
-        {
-            new User()
-        };
+        Users = (await UsersService.GetAsync()).ToList();
     }
 
     private async Task RemoveUser(User user)
