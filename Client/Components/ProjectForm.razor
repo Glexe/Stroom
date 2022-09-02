@@ -1,0 +1,40 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Stroom.Client.Services
+@using Stroom.Shared
+@using Stroom.Shared.Models
+@using Stroom.Shared.Enums
+
+<style>
+    /*overriding framework class*/
+    .mud-tooltip-root{
+        width: 100% !important;
+    }
+</style>
+
+<MudStack>
+    <MudStack>
+    <MudPaper Class="pa-4">
+        <MudTextField Required="true" Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5" @bind-Value="Project.Name" Immediate="true" Label="Name"/>
+        <MudTextField Required="true" Class="d-inline" Style="font-weight: 500;" Typo="Typo.h5" @bind-Value="Project.Description" Immediate="true" Label="Description"/>
+    </MudPaper>
+    </MudStack>
+</MudStack>
+
+@code {
+    private ProjectDto _Project;
+    [Parameter]
+    public ProjectDto Project 
+    {
+        get => _Project;
+        set
+        {
+            if (_Project == value) return;
+
+            _Project = value;
+            ProjectChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<ProjectDto> ProjectChanged { get; set; }
+}

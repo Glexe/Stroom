@@ -9,8 +9,8 @@ namespace Stroom.Shared.Models
     public class ProjectDto
     {
         public int ProjectID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
         //public virtual List<User> AssignedUsers { get; set; } = new List<User>();
         //public virtual List<TaskDto> Tasks { get; set; } = new List<TaskDto>();
 

@@ -1,4 +1,4 @@
-﻿@page "/tasks/new"
+﻿@page "/projects/new"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Stroom.Client.Services
@@ -8,13 +8,14 @@
 @using static Stroom.Shared.Enums.TaskPropertiesEnums
 @attribute [Authorize]
 @inject HttpClient Http
-@inject ITasksService TasksService
 @inject NavigationManager NavigationManager
+@inject ITasksService TasksService
+@inject IProjectsService ProjectsService
 
-<PageTitle>Add new task</PageTitle>
+<PageTitle>Add new project</PageTitle>
 
 <div>
-    <TaskForm @bind-Task="Task" />
+    <ProjectForm @bind-Project="Project" />
     <MudStack Row="true" Class="mt-4">
         <MudButton Href="/" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error">Cancel</MudButton>
         <MudButton OnClick="Save" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
@@ -22,24 +23,11 @@
 </div>
 
 @code {
-    private TaskDto Task { get; set; }
-
-    private bool OrderCommentsDescending = true;
-    private SortDirection CommentsSortDirection => OrderCommentsDescending ? SortDirection.Descending : SortDirection.Ascending;
-
-    protected override void OnInitialized()
-    {
-        Task = new TaskDto();
-    }
-
-    private void FlipSortDirection(){
-        OrderCommentsDescending = !OrderCommentsDescending;
-        Task.Comments = Task.Comments.OrderByDirection(CommentsSortDirection, userComment => userComment.TimeStamp).ToList();
-    }
+    private ProjectDto Project { get; set; } = new ProjectDto();
 
     private void Save()
     {
-        TasksService.AddAsync(Task);
+        ProjectsService.AddAsync(Project);
         NavigationManager.NavigateTo("/");
     }
 }

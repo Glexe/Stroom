@@ -47,7 +47,7 @@ namespace Stroom.Server.Repositories
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return ApplicationDbContext.SaveChanges() == 1;
         }
     }
 }

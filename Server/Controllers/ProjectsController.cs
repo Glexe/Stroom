@@ -33,6 +33,14 @@ namespace Stroom.Server.Controllers
             return Ok(ProjectsRepository.Get(projectId));
         }
         
+        [HttpPost]
+        public ActionResult Add(ProjectDto project)
+        {
+            ProjectsRepository.Add(project);
+            var res = ProjectsRepository.SaveChanges();
+            return Ok(res);
+        }
+        
         [HttpGet("{projectId}/add-user/{token}")]
         public ActionResult<ProjectDto> AddUserToProject(int projectId, string token)
         {
